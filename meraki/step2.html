@@ -7,12 +7,27 @@
             src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.js"></script>
 </head>
 <body>
-<div class="ui fluid container">
+<div class="ui fluid container" id="step2">
     <div class="step 1">
-        <div class="ui three item menu">
-            <a class="active item">Step 1</a>
-            <a class="item">Step 2</a>
-            <a class="item">Step 3</a>
+        <div class="ui fluid ordered steps">
+            <div class="completed step">
+                <div class="content">
+                    <div class="title"><a href="/meraki/step1.html">Step 1</a></div>
+                    <div class="description">Choose your shipping options</div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="content">
+                    <div class="title">Step 2</div>
+                    <div class="description">Enter billing information</div>
+                </div>
+            </div>
+            <div class="active step">
+                <div class="content">
+                    <div class="title"><a href="/meraki/step3.html">Step 3</a></div>
+                    <div class="description">Verify order details</div>
+                </div>
+            </div>
         </div>
         <div class="ui centered container" style="text-align: center; vertical-align: middle;
 line-height: 90px; padding-top: 100px">
@@ -20,15 +35,16 @@ line-height: 90px; padding-top: 100px">
                 Load configuration
             </h2>
             <h4>
-                Load configuration for devices and ports. Choose the path where your configuration for your device and ports is
+                Load configuration for devices and ports. Choose the path where your configuration for your device and
+                ports is
                 located. </br>
 
                 <div class="ui search">
-                <div class="ui icon input">
-                <input class="prompt" type="text" placeholder="Search for Path...">
-                <i class="search icon"></i>
-                </div>
-                <div class="results"></div>
+                    <div class="ui icon input">
+                        <input class="prompt" type="text" placeholder="Search for Path...">
+                        <i class="search icon"></i>
+                    </div>
+                    <div class="results"></div>
                 </div>
                 </br>
                 </br>
@@ -40,7 +56,6 @@ line-height: 90px; padding-top: 100px">
                 <button class="ui right floated blue button">
                     Validate
                 </button>
-
 
 
             </h4>
