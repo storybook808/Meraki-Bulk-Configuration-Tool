@@ -7,13 +7,28 @@
             src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.js"></script>
 </head>
 <body>
-<div class="ui fluid container">
+<div class="ui fluid container" id = "step3">
     <div class="step 3">
-        <div class="ui three item menu">
-            <a class="active item">Step 1</a>
-            <a class="item">Step 2</a>
-            <a class="item">Step 3</a>
+        <div class="ui fluid ordered steps">
+        <div class="completed step">
+            <div class="content">
+                <a href = "#step1"><div class="title">Step 1</div></a>
+                <div class="description">Choose your shipping options</div>
+            </div>
         </div>
+        <div class="completed step">
+            <div class="content">
+                <div class="title">Step 2</div>
+                <div class="description">Enter billing information</div>
+            </div>
+        </div>
+        <div class="active step">
+            <div class="content">
+                <div class="title">Step 3</div>
+                <div class="description">Verify order details</div>
+            </div>
+        </div>
+    </div>
         <div class="ui centered container" style="text-align: center; vertical-align: middle;
 line-height: 90px; padding-top: 100px">
             <h2>
