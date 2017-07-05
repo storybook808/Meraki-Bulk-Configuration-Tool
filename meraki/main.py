@@ -2,6 +2,17 @@ import csv
 import merakiapi
 
 
+
+# generate api_key before you start:
+# go to my profile on meraki.cisco.com
+# go down to API access
+# click on "generate API key"
+# copy and paste long string for the API key onto this code
+
+# For Testing:
+# Organization name: World Wide
+
+
 class Device:
     def __init__(self, row):
         self.serial_number = row[0]
@@ -88,19 +99,23 @@ class SwitchPort:
 def main():
     # Pull the configurations.
     configurations = {}
-    file_1 = open("Samuel Kamakau - Switch Port Configuration.csv")
+
+    file_1 = open("testing.csv")
+
     csv_1 = csv.reader(file_1)
     for row in csv_1:
         configurations[row[0]+str(row[1])] = SwitchPort(row)
 
-    print configurations
+
+    print (configurations)
 
     # API key.
-    api_key = ""
+    api_key = "184f6d28e8c02dcb642cf48a7fed40d747f8ba01"
 
     # Get the organization name.
     print("Organization Name:")
-    org_name = raw_input()
+    org_name = input()
+
 
     # Pull the organizations associated to the provided API key.
     orgs = merakiapi.myorgaccess(api_key, True)
@@ -140,7 +155,9 @@ def main():
         # Append the switch ports for the current switch to the master list.
         switch_ports += current_switch_ports
 
-    print switch_ports
+
+    print (switch_ports)
+
 
     # Apply configuration to the devices and push them to Meraki.
     for switch_port in switch_ports:
