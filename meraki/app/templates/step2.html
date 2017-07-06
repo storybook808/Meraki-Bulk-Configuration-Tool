@@ -37,17 +37,15 @@ line-height: 90px; padding-top: 100px">
             <h4>
                 Load configuration for devices and ports. Choose the path where your configuration for your device and
                 ports is
-                located. </br>
+                located.
 
-                <div class="ui search">
-                    <div class="ui icon input">
-                        <input class="prompt" type="text" placeholder="Search for Path...">
-                        <i class="search icon"></i>
-                    </div>
-                    <div class="results"></div>
-                </div>
-                </br>
-                </br>
+
+                <form action="http://localhost:5000/uploader" method="POST"
+                      enctype="multipart/form-data">
+                    <input type="file" name="file"/>
+                    <input type="submit"/>
+                </form>
+
 
                 <button class="ui right floated green button">
                     Run
