@@ -1,8 +1,25 @@
 from app import app
-from flask import render_template, make_response
+from flask import render_template, request, redirect, url_for
+import os
+from werkzeug import secure_filename
+
+#@app.route('/upload')
+#def upload_file2():
+#    return render_template('upload.html')
+
+
+
+@app.route('/uploader', methods = ['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        app.config['UPLOAD_FOLDER'] = os.path.join(current_dir, 'temp/')
+        f = request.files['file']
+        f.save(os.path.join(app.config['UPLOAD_FOLDER'],
+                            secure_filename(f.filename)))
+        return 'FILE UPLOADED'
 
 @app.route('/')
-
 @app.route('/step1.html')
 def step1():
     return render_template('step1.html')
