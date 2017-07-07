@@ -15,7 +15,7 @@ def step2():
 def step3():
     return render_template('step3.html')
 
-@app.route('/csv/')
+''''@app.route('/csv/')
 def download_csv():
     csv = 'Hostname,Serial Number,Port Number,Name,Tags,Enabled,RSTP,STP Guard,PoE,Type,VLAN,Voice VLAN,Allowed VLANs'
     response = make_response(csv)
@@ -24,3 +24,4 @@ def download_csv():
     response.mimetype = 'text/csv'
 
     return response
+'''
