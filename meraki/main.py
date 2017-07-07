@@ -2,17 +2,6 @@ import csv
 import merakiapi
 
 
-
-# generate api_key before you start:
-# go to my profile on meraki.cisco.com
-# go down to API access
-# click on "generate API key"
-# copy and paste long string for the API key onto this code
-
-# For Testing:
-# Organization name: World Wide
-
-
 class Device:
     def __init__(self, row):
         self.serial_number = row[0]
@@ -26,32 +15,33 @@ class Device:
 
 class SwitchPort:
     def __init__(self, row):
-        self.serial_number = row[0]
-        self.port_number = row[1]
-        self.name = row[2]
-        self.tags = row[3]
+        self.hostname = row[0]
+        self.serial_number = row[1]
+        self.port_number = row[2]
+        self.name = row[3]
+        self.tags = row[4]
 
-        if row[4].lower() == "true":
+        if row[5].lower() == "true":
             self.enabled = True
         else:
             self.enabled = False
 
-        if row[5].lower() == "true":
+        if row[6].lower() == "true":
             self.rstp = True
         else:
             self.rstp = False
 
-        self.stp_guard = row[6]
+        self.stp_guard = row[7]
 
-        if row[7].lower() == "true":
+        if row[8].lower() == "true":
             self.poe = True
         else:
             self.poe = False
 
-        self.type = row[8]
-        self.vlan = row[9]
-        self.voice_vlan = row[10]
-        self.allowed_vlan = row[11]
+        self.type = row[9]
+        self.vlan = row[10]
+        self.voice_vlan = row[11]
+        self.allowed_vlan = row[12]
 
 # def main():
 #     # Pull the configurations.
@@ -99,23 +89,19 @@ class SwitchPort:
 def main():
     # Pull the configurations.
     configurations = {}
-
-    file_1 = open("testing.csv")
-
+    file_1 = open("8PPortConfiguration.csv")
     csv_1 = csv.reader(file_1)
     for row in csv_1:
-        configurations[row[0]+str(row[1])] = SwitchPort(row)
+        configurations[row[1]+str(row[2])] = SwitchPort(row)
 
-
-    print (configurations)
+  #  print (configurations)
 
     # API key.
-    api_key = "184f6d28e8c02dcb642cf48a7fed40d747f8ba01"
+    api_key = "d291c4e37a3edf9346a0adcb0509236d79c80951"
 
     # Get the organization name.
     print("Organization Name:")
     org_name = input()
-
 
     # Pull the organizations associated to the provided API key.
     orgs = merakiapi.myorgaccess(api_key, True)
@@ -146,7 +132,7 @@ def main():
         if device["model"].startswith("MS"):
             # current_switch_port = merakiapi.getswitchports(api_key, device["serial"])
             # current_switch_port["serial"] = device["serial"]
-            current_switch_ports = merakiapi.getswitchports(api_key, device["serial"], True)
+            current_switch_ports = merakiapi.getswitchports(api_key, device["serial"], False)
 
         # Label all current switch ports with the serial number of the parent switch.
         for switch_port in current_switch_ports:
@@ -155,9 +141,7 @@ def main():
         # Append the switch ports for the current switch to the master list.
         switch_ports += current_switch_ports
 
-
     print (switch_ports)
-
 
     # Apply configuration to the devices and push them to Meraki.
     for switch_port in switch_ports:
