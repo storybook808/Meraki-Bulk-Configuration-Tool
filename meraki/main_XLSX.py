@@ -95,15 +95,15 @@ def main():
     ws = wb[first_sheet]
 
     my_row = []
-    for i in range(1, ws.max_row - 2):
-        for j in range(1, ws.max_column - 1):
-            my_row.append(ws.cell(row=i+1, column=j).value)
-
-        #configurations[ws.cell(row=i + 1, column=2).value + str(ws.cell(row=i + 1, column=3).value)] = SwitchPort(my_row)  # dictionary
-        print(ws.cell(row=i + 1, column=2).value + str(ws.cell(row=i + 1, column=3).value))
+    for i in range(1, ws.max_row - 1 ):
+        for j in range(1, 14): # max column number
+            my_row.append(ws.cell(row=i, column=j).value)
+        configurations[ws.cell(row=i, column=2).value + str(ws.cell(row=i + 1, column=3).value)] = SwitchPort(my_row)  # dictionary
+        #print(ws.cell(row=i + 1, column=2).value + str(ws.cell(row=i + 1, column=3).value))
         print(my_row)
+        my_row = []
 
-    print (configurations)
+    #print (configurations)
 
     # API key.
     api_key = "8b43aaa7b92b6d3ad06234e6f581077620d3e512"
