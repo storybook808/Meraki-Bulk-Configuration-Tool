@@ -1,5 +1,5 @@
 from app import app
-from flask import render_template
+from flask import render_template, make_response
 
 @app.route('/')
 
@@ -15,4 +15,12 @@ def step2():
 def step3():
     return render_template('step3.html')
 
-#comment
+@app.route('/csv/')
+def download_csv():
+    csv = 'Hostname,Serial Number,Port Number,Name,Tags,Enabled,RSTP,STP Guard,PoE,Type,VLAN,Voice VLAN,Allowed VLANs'
+    response = make_response(csv)
+    cd = 'attachment; filename=template.csv'
+    response.headers['Content-Disposition'] = cd
+    response.mimetype = 'text/csv'
+
+    return response
