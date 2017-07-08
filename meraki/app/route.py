@@ -51,8 +51,8 @@ def main():
 
     class Device:
         def __init__(self, row):
-            self.serial_number = row[0]
-            self.hostname = row[1]
+            self.hostname = row[0]
+            self.serial_number = row[1]
             self.ip = row[2]
             self.vlan = row[3]
             self.subnet_mask = row[4]
@@ -62,32 +62,34 @@ def main():
 
     class SwitchPort:
         def __init__(self, row):
-            self.serial_number = row[0]
-            self.port_number = row[1]
-            self.name = row[2]
-            self.tags = row[3]
+            self.hostname = row[0]
+            self.serial_number = row[1]
+            self.port_number = row[2]
+            self.name = row[3]
+            self.tags = row[4]
 
-            if row[4].lower() == "true":
+            if row[5].lower() == "true":
                 self.enabled = True
             else:
                 self.enabled = False
 
-            if row[5].lower() == "true":
+            if row[6].lower() == "true":
                 self.rstp = True
             else:
                 self.rstp = False
 
-            self.stp_guard = row[6]
+            self.stp_guard = row[7]
 
-            if row[7].lower() == "true":
+            if row[8].lower() == "true":
                 self.poe = True
             else:
                 self.poe = False
 
-            self.type = row[8]
-            self.vlan = row[9]
-            self.voice_vlan = row[10]
-            self.allowed_vlan = row[11]
+            self.type = row[9]
+            self.vlan = row[10]
+            print(row)
+            self.voice_vlan = row[11]
+            self.allowed_vlan = row[12]
 
     # def main():
     #     # Pull the configurations.
@@ -133,96 +135,96 @@ def main():
     #     return
 
         # Pull the configurations.
-        random.seed()
-        configurations = {}
-        path = os.path.abspath(os.path.join('app', 'temp'))
-        #path = os.path.join(initial_path, 'temp')
+    random.seed()
+    configurations = {}
+    path = os.path.abspath(os.path.join('app', 'temp'))
+    #path = os.path.join(initial_path, 'temp')
 
-        current_file = os.listdir(path)
-       # print(initial_path)
-        print(path)
-        print(current_file)
+    current_file = os.listdir(path)
+   # print(initial_path)
+    print(path)
+    print(current_file)
 
-        #file_1 = open(current_file)
-        #csv_1 = csv.reader(file_1)
-        for row in csv_1:
-            configurations[row[0] + str(row[1])] = SwitchPort(row)
+    file_1 = open(current_file[0])
+    csv_1 = csv.reader(file_1)
+    for row in csv_1:
+        configurations[row[0] + str(row[1])] = SwitchPort(row)
 
-        print(configurations)
+    print(configurations)
 
-        # API key.
-        api_key = ""
+    # API key.
+    api_key = "36b0616a7dda8c0017f621cb66a4e666effad0d0"
 
-        # Get the organization name.
-        print("Organization Name:")
-        org_name = input()
+    # Get the organization name.
+    print("Organization Name:")
+    org_name = input()
 
-        # Pull the organizations associated to the provided API key.
-        orgs = merakiapi.myorgaccess(api_key, True)
+    # Pull the organizations associated to the provided API key.
+    orgs = merakiapi.myorgaccess(api_key, True)
 
-        # Look for the organization that we want to configure.
-        org_id = ""
-        for org in orgs:
-            if org_name in org["name"]:
-                org_id = org["id"]
+    # Look for the organization that we want to configure.
+    org_id = ""
+    for org in orgs:
+        if org_name in org["name"]:
+            org_id = org["id"]
 
-        if org_id == "":
-            print("Organization not found.")
-
-
-        # Pull the networks associated with the organization.
-        networks = merakiapi.getnetworklist(api_key, org_id, True)
-
-        # Pull the devices from all of the networks.
-        devices = []
-        for network in networks:
-            devices += merakiapi.getnetworkdevices(api_key, network["id"], True)
-
-        # print devices
-
-        switch_ports = []
-        for device in devices:
-            current_switch_ports = []
-            if device["model"].startswith("MS"):
-                # current_switch_port = merakiapi.getswitchports(api_key, device["serial"])
-                # current_switch_port["serial"] = device["serial"]
-                current_switch_ports = merakiapi.getswitchports(api_key, device["serial"], True)
-
-            # Label all current switch ports with the serial number of the parent switch.
-            for switch_port in current_switch_ports:
-                switch_port["serial"] = device["serial"]
-
-            # Append the switch ports for the current switch to the master list.
-            switch_ports += current_switch_ports
-
-        print(switch_ports)
-
-        # Apply configuration to the devices and push them to Meraki.
-        for switch_port in switch_ports:
-            try:
-                switch_port["name"] = configurations[switch_port["serial"] + str(switch_port["number"])].name
-            except:
-                continue
-            switch_port["tags"] = configurations[switch_port["serial"] + str(switch_port["number"])].tags
-            switch_port["enabled"] = configurations[switch_port["serial"] + str(switch_port["number"])].enabled
-            switch_port["rstpEnabled"] = configurations[switch_port["serial"] + str(switch_port["number"])].rstp
-            switch_port["stpGuard"] = configurations[switch_port["serial"] + str(switch_port["number"])].stp_guard
-            switch_port["poeEnabled"] = configurations[switch_port["serial"] + str(switch_port["number"])].poe
-            switch_port["type"] = configurations[switch_port["serial"] + str(switch_port["number"])].type
-            switch_port["vlan"] = configurations[switch_port["serial"] + str(switch_port["number"])].vlan
-            switch_port["voiceVlan"] = configurations[switch_port["serial"] + str(switch_port["number"])].voice_vlan
-            switch_port["allowedVlans"] = configurations[
-                switch_port["serial"] + str(switch_port["number"])].allowed_vlan
-
-            # print switch_port["enabled"]
+    if org_id == "":
+        print("Organization not found.")
 
 
-            merakiapi.updateswitchport(api_key, switch_port["serial"], switch_port["number"], switch_port["name"],
-                                       switch_port["tags"], switch_port["enabled"], switch_port["type"],
-                                       switch_port["vlan"], switch_port["voiceVlan"], switch_port["allowedVlans"],
-                                       switch_port["poeEnabled"], "", switch_port["rstpEnabled"],
-                                       switch_port["stpGuard"],
-                                       "")
+    # Pull the networks associated with the organization.
+    networks = merakiapi.getnetworklist(api_key, org_id, True)
+
+    # Pull the devices from all of the networks.
+    devices = []
+    for network in networks:
+        devices += merakiapi.getnetworkdevices(api_key, network["id"], True)
+
+    # print devices
+
+    switch_ports = []
+    for device in devices:
+        current_switch_ports = []
+        if device["model"].startswith("MS"):
+            # current_switch_port = merakiapi.getswitchports(api_key, device["serial"])
+            # current_switch_port["serial"] = device["serial"]
+            current_switch_ports = merakiapi.getswitchports(api_key, device["serial"], True)
+
+        # Label all current switch ports with the serial number of the parent switch.
+        for switch_port in current_switch_ports:
+            switch_port["serial"] = device["serial"]
+
+        # Append the switch ports for the current switch to the master list.
+        switch_ports += current_switch_ports
+
+    print(switch_ports)
+
+    # Apply configuration to the devices and push them to Meraki.
+    for switch_port in switch_ports:
+        try:
+            switch_port["name"] = configurations[switch_port["serial"] + str(switch_port["number"])].name
+        except:
+            continue
+        switch_port["tags"] = configurations[switch_port["serial"] + str(switch_port["number"])].tags
+        switch_port["enabled"] = configurations[switch_port["serial"] + str(switch_port["number"])].enabled
+        switch_port["rstpEnabled"] = configurations[switch_port["serial"] + str(switch_port["number"])].rstp
+        switch_port["stpGuard"] = configurations[switch_port["serial"] + str(switch_port["number"])].stp_guard
+        switch_port["poeEnabled"] = configurations[switch_port["serial"] + str(switch_port["number"])].poe
+        switch_port["type"] = configurations[switch_port["serial"] + str(switch_port["number"])].type
+        switch_port["vlan"] = configurations[switch_port["serial"] + str(switch_port["number"])].vlan
+        switch_port["voiceVlan"] = configurations[switch_port["serial"] + str(switch_port["number"])].voice_vlan
+        switch_port["allowedVlans"] = configurations[
+            switch_port["serial"] + str(switch_port["number"])].allowed_vlan
+
+        # print switch_port["enabled"]
+
+
+        merakiapi.updateswitchport(api_key, switch_port["serial"], switch_port["number"], switch_port["name"],
+                                   switch_port["tags"], switch_port["enabled"], switch_port["type"],
+                                   switch_port["vlan"], switch_port["voiceVlan"], switch_port["allowedVlans"],
+                                   switch_port["poeEnabled"], "", switch_port["rstpEnabled"],
+                                   switch_port["stpGuard"],
+                                   "")
 
 
 if __name__ == "__main__":
