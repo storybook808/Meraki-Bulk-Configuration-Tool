@@ -148,7 +148,7 @@ def main():
     file_1 = open(current_file[0])
     csv_1 = csv.reader(file_1)
     for row in csv_1:
-        configurations[row[0] + str(row[1])] = SwitchPort(row)
+        configurations[row[1] + str(row[2])] = SwitchPort(row)
 
     print(configurations)
 
@@ -201,9 +201,12 @@ def main():
 
     # Apply configuration to the devices and push them to Meraki.
     for switch_port in switch_ports:
+        print("ENTER4")
         try:
             switch_port["name"] = configurations[switch_port["serial"] + str(switch_port["number"])].name
         except:
+            print("except?")
+            print(switch_port["name"])
             continue
         switch_port["tags"] = configurations[switch_port["serial"] + str(switch_port["number"])].tags
         switch_port["enabled"] = configurations[switch_port["serial"] + str(switch_port["number"])].enabled
@@ -214,17 +217,19 @@ def main():
         switch_port["vlan"] = configurations[switch_port["serial"] + str(switch_port["number"])].vlan
         switch_port["voiceVlan"] = configurations[switch_port["serial"] + str(switch_port["number"])].voice_vlan
         switch_port["allowedVlans"] = configurations[
-            switch_port["serial"] + str(switch_port["number"])].allowed_vlan
+        switch_port["serial"] + str(switch_port["number"])].allowed_vlan
 
         # print switch_port["enabled"]
 
-
-        merakiapi.updateswitchport(api_key, switch_port["serial"], switch_port["number"], switch_port["name"],
+        print(switch_port["allowedVlans"])
+        result = merakiapi.updateswitchport(api_key, switch_port["serial"], switch_port["number"], switch_port["name"],
                                    switch_port["tags"], switch_port["enabled"], switch_port["type"],
                                    switch_port["vlan"], switch_port["voiceVlan"], switch_port["allowedVlans"],
                                    switch_port["poeEnabled"], "", switch_port["rstpEnabled"],
                                    switch_port["stpGuard"],
                                    "")
+
+        print(result)
 
 
 if __name__ == "__main__":
