@@ -230,6 +230,7 @@ def main():
                                    "")
 
         print(result)
+        os.rename(current_file[0], "app/archive/testfile")
 
 
 if __name__ == "__main__":
