@@ -144,6 +144,7 @@ def main():
    # print(initial_path)
     print(path)
     print(current_file)
+    print(current_file[0])
 
     file_1 = open(current_file[0])
     csv_1 = csv.reader(file_1)
@@ -230,7 +231,9 @@ def main():
                                    "")
 
         print(result)
-        os.rename(current_file[0], "app/archive/testfile")
+
+    os.rename(current_file[0], "app/archive/justafile.csv")
+    return "IT WORKS!"
 
 
 if __name__ == "__main__":
