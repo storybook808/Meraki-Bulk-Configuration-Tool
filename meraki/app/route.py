@@ -156,8 +156,6 @@ def main():
     print(current_file[0])
     print(os.path.join(path, current_file[0]))
     temp_path = os.path.join(path, current_file[0])
-    if len(current_file) > 1:
-        extra_temp_file = os.path.join(path, current_file[1])
     file_1 = open(temp_path)
     csv_1 = csv.reader(file_1)
     for row in csv_1:
@@ -244,7 +242,8 @@ def main():
 
         print(result)
 
-    shutil.copy(extra_temp_file, "app/archive")
+    archive_path = os.path.abspath(os.path.join('app', 'archive'))
+    shutil.copy(temp_path, archive_path)
 
     return "IT WORKS!"
 
