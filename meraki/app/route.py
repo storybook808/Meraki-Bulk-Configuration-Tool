@@ -1,27 +1,17 @@
 from app import app
-from flask import render_template, make_response, redirect, url_for, flash
-import os, shutil
+from flask import render_template, request, redirect, url_for
+import os
 from werkzeug import secure_filename
+import openpyxl
 
-
-app.secret_key = 'some_secret'
 @app.route('/uploader', methods=['GET', 'POST'])
 def upload_file():
-    import os
-
     if request.method == 'POST':
         current_dir = os.path.dirname(os.path.abspath(__file__))
         app.config['UPLOAD_FOLDER'] = os.path.join(current_dir, 'temp/')
         f = request.files['file']
         f.save(os.path.join(app.config['UPLOAD_FOLDER'],
                             secure_filename(f.filename)))
-        path = os.path.abspath(os.path.join('app', 'temp'))
-        current_file = os.listdir(path)
-        print(current_file)
-        if len(current_file) > 1:
-            os.remove(os.path.join(path, current_file[1]))
-            print("file removed brah")
-
         return 'FILE UPLOADED'
 
 @app.route('/')
@@ -51,130 +41,11 @@ def download_csv():
     return response
 '''
 
-@app.route('/index/')
-def validate_form():
-    import xlrd
-    workbook = xlrd.open_workbook('testing.xlsx')
-    worksheet = workbook.sheet_by_index(0)
-
-    # for T/F values: Enabled, RSTP and PoE
-    for row in range(1, worksheet.nrows):
-        # grab value for enable
-        j = worksheet.cell_value(row, 5)
-        # grab value for RSTP
-        k = worksheet.cell_value(row, 6)
-        # grab value for PoE
-        m = worksheet.cell_value(row, 8)
-        # print (j, k, m)
-        if j == 1 or j == 0 or j == '':
-            pass
-        else:
-            flash('Enabled must be either True or False')
-            #break
-        if k == 1 or k == 0 or k == '':
-            pass
-        else:
-            flash('RSTP must be either True or False')
-            #break
-        if m == 1 or m == 0 or m == '':
-            pass
-        else:
-            flash('PoE must be either True or False')
-            #break
-
-    # for checking that serial # is a 12 alpha numberic string
-    #for row in range(1, worksheet.nrows):
-        l = worksheet.cell(row, 1)
-        # print(l.value.lower().replace('-',''))
-        # print(len(l.value.lower().replace('-','')))
-        if (len(l.value.lower().replace('-', '')) == 12):
-            if l.ctype == 1 or l.ctype == 0:
-                pass
-            else:
-                flash("Serial number must be a 12 character alpha numeric string")
-                #break
-        else:
-            flash("Serial number must be a 12 character alpha numeric string")
-            #break
-    # print('Serial Number is done')
-
-    # for checking that STP Guard must be 'disabled' 'root gound' or 'BPDU'
-    #for row in range(1, worksheet.nrows):
-        n = worksheet.cell(row, 7)
-        # print(n.value.lower())
-        if n.value.lower() == "disabled" or n.value.lower() == 'root guard' or n.value.lower() == 'bpdu guard' or n.value.lower() == '':
-            pass
-        else:
-            flash("""STP Guard must be 'disabled' 'Root guard' or 'BPDU guard'""")
-            #break
-    # print('STP Guard is done')
-
-    # for checking that Type is either access or trunk
-    #for row in range(1, worksheet.nrows):
-        o = worksheet.cell(row, 9)
-        # print(o.value)
-        if o.value == "trunk" or o.value == "access" or o.value == '':
-            pass
-        else:
-            flash("Type must be either access or trunk")
-            #break
-    # print('Type is done')
-
-    # VLAN must be a number
-    #for row in range(1, worksheet.nrows):
-        p = worksheet.cell(row, 10)
-        # print(p.value)
-        if p.ctype == 0 or p.ctype == 2:
-            pass
-        else:
-            flash("VLAN must be a number")
-            #break
-    # print('VLAN is done')
-
-    # Voice VLAN must be a number
-    #for row in range(1, worksheet.nrows):
-        q = worksheet.cell(row, 11)
-        # print(q.value)
-        if q.ctype == 0 or q.ctype == 2:
-            pass
-        else:
-
-            flash("Voice VLAN must be a number")
-            #break
-    # print('Voice VLAN is done')
-
-    # Port # must be a number
-    #for row in range(1, worksheet.nrows):
-        r = worksheet.cell(row, 2)
-        # print(r.value)
-        if r.ctype == 0 or r.ctype == 2:
-            pass
-        else:
-            flash("Port # must be a number")
-            #break
-    # print('Port # is done')
-
-    # Allowed VLANs can be all or comma seperated numbers
-    #for row in range(1, worksheet.nrows):
-        s = worksheet.cell(row, 12)
-        # print(s.value)
-        # print(s.ctype)
-        if s.ctype == 0 or s.ctype == 1 and s.value == 'all' or s.ctype == 2 or s.value == '':
-            pass
-        else:
-            flash("Allowed VLANs must be 'all' or numbers")
-            #break
-    # print('Allowed VLANs is done')
-
-    return redirect(url_for('step2'))
-
 
 @app.route('/main', methods=['POST'])
 def main():
-    import csv
     import merakiapi
     import os
-    import random
 
     class Device:
         def __init__(self, row):
@@ -195,26 +66,25 @@ def main():
             self.name = row[3]
             self.tags = row[4]
 
-            if row[5].lower() == "true":
+            if row[5] == "TRUE":
                 self.enabled = True
             else:
                 self.enabled = False
 
-            if row[6].lower() == "true":
+            if row[6] == "TRUE":
                 self.rstp = True
             else:
                 self.rstp = False
 
             self.stp_guard = row[7]
 
-            if row[8].lower() == "true":
+            if row[8] == "TRUE":
                 self.poe = True
             else:
                 self.poe = False
 
             self.type = row[9]
             self.vlan = row[10]
-            print(row)
             self.voice_vlan = row[11]
             self.allowed_vlan = row[12]
 
@@ -261,28 +131,70 @@ def main():
     #
     #     return
 
-        # Pull the configurations.
-    random.seed()
-    configurations = {}
-    path = os.path.abspath(os.path.join('app', 'temp'))
-    #path = os.path.join(initial_path, 'temp')
 
+    ### Find file path to pull configurations ###
+    path = os.path.abspath(os.path.join('app', 'temp'))
+    # path = os.path.join(initial_path, 'temp')
     current_file = os.listdir(path)
-   # print(initial_path)
-    print(path)
-    print(current_file)
+    # print(initial_path)
+    # print(path)
+    # print(current_file)
     print(current_file[0])
     print(os.path.join(path, current_file[0]))
-    temp_path = os.path.join(path, current_file[0])
-    file_1 = open(temp_path)
-    csv_1 = csv.reader(file_1)
-    for row in csv_1:
-        configurations[row[1] + str(row[2])] = SwitchPort(row)
+    temp_path = os.path.join(path, current_file[0]) # path of configuration file
 
-    print(configurations)
+    ### Pull the configurations. ###
+    configurations = {}
+    from openpyxl import load_workbook
+    wb = load_workbook(filename=temp_path)
+    first_sheet = wb.get_sheet_names()[0]
+    ws = wb[first_sheet]
+
+    ### valid row count ###
+    valid_row = 0  # will be incremented to the number of valid rows
+    threshold = 2  # how many consecutive blank rows are allow before program stops scanning excel content
+    real_row = 0  # track the actual row in excel file, including blank rows
+    th_count = threshold
+    while (th_count != 0):
+        real_row += 1
+        if (ws.cell(row=real_row, column=2).value != None and ws.cell(row=real_row, column=3).value != None):
+            # print(ws.cell(row = valid_row + 1, column=2).value)
+            valid_row += 1
+            th_count = threshold  # if blank row is not consecutive to the number of threshold, reset th_count
+        elif (ws.cell(row=real_row, column=2).value == None and ws.cell(row=real_row, column=3).value != None):
+            print("row", real_row, "has incomplete entry")
+        elif (ws.cell(row=real_row, column=2).value != None and ws.cell(row=real_row, column=3).value == None):
+            print("row", real_row, "has incomplete entry")
+        else:
+            th_count -= 1
+
+    progress_total = valid_row - 1 # save total number of excel entries to track for progress while compiling
+    progress_count = 0  # initialize variable for progress count
+
+    ### create dictionary for switch port ###
+    my_row = []
+    i = 0
+    while (valid_row != 0):
+        i += 1
+        if (ws.cell(row=i, column=2).value == None and ws.cell(row=i, column=3).value != None):
+            pass
+        elif (ws.cell(row=i, column=2).value != None and ws.cell(row=i, column=3).value == None):
+            pass
+        elif (ws.cell(row=i, column=2).value == None and ws.cell(row=i, column=3).value == None):
+            pass
+        else:
+            for j in range(1, 14):  # max column number
+                my_row.append(ws.cell(row=i, column=j).value)
+            configurations[ws.cell(row=i, column=2).value, str(ws.cell(row=i, column=3).value)] = SwitchPort(my_row)  # dictionary
+            # print(ws.cell(row = i, column = 2).value , str(ws.cell(row = i, column=3).value))
+            # print(my_row)
+            my_row = []  # reset
+            valid_row -= 1
+
+    # print(configurations)
 
     # API key.
-    api_key = "36b0616a7dda8c0017f621cb66a4e666effad0d0"
+    api_key = "8b43aaa7b92b6d3ad06234e6f581077620d3e512"
 
     # Get the organization name.
     print("Organization Name:")
@@ -300,15 +212,14 @@ def main():
     if org_id == "":
         print("Organization not found.")
 
-####
-    # Pull the networks associated with the organization.
+
+    ### Pull the networks associated with the organization. ###
     networks = merakiapi.getnetworklist(api_key, org_id, True)
 
-    # Pull the devices from all of the networks.
+    ### Pull the devices from all of the networks. ###
     devices = []
     for network in networks:
         devices += merakiapi.getnetworkdevices(api_key, network["id"], True)
-
     # print devices
 
     switch_ports = []
@@ -328,44 +239,38 @@ def main():
 
     print(switch_ports)
 
-    # Apply configuration to the devices and push them to Meraki.
+    ### Apply configuration to the devices and push them to Meraki. ###
     for switch_port in switch_ports:
-        print("ENTER4")
         try:
-            switch_port["name"] = configurations[switch_port["serial"] + str(switch_port["number"])].name
+            switch_port["name"] = configurations[switch_port["serial"],str(switch_port["number"])].name
         except:
-            print("except?")
-            print(switch_port["name"])
             continue
-        switch_port["tags"] = configurations[switch_port["serial"] + str(switch_port["number"])].tags
-        switch_port["enabled"] = configurations[switch_port["serial"] + str(switch_port["number"])].enabled
-        switch_port["rstpEnabled"] = configurations[switch_port["serial"] + str(switch_port["number"])].rstp
-        switch_port["stpGuard"] = configurations[switch_port["serial"] + str(switch_port["number"])].stp_guard
-        switch_port["poeEnabled"] = configurations[switch_port["serial"] + str(switch_port["number"])].poe
-        switch_port["type"] = configurations[switch_port["serial"] + str(switch_port["number"])].type
-        switch_port["vlan"] = configurations[switch_port["serial"] + str(switch_port["number"])].vlan
-        switch_port["voiceVlan"] = configurations[switch_port["serial"] + str(switch_port["number"])].voice_vlan
-        switch_port["allowedVlans"] = configurations[
-        switch_port["serial"] + str(switch_port["number"])].allowed_vlan
+        switch_port["tags"]  = configurations[switch_port["serial"],str(switch_port["number"])].tags
+        switch_port["enabled"] = configurations[switch_port["serial"],str(switch_port["number"])].enabled
+        switch_port["rstpEnabled"] = configurations[switch_port["serial"],str(switch_port["number"])].rstp
+        switch_port["stpGuard"] = configurations[switch_port["serial"],str(switch_port["number"])].stp_guard
+        switch_port["poeEnabled"] = configurations[switch_port["serial"],str(switch_port["number"])].poe
+        switch_port["type"] = configurations[switch_port["serial"],str(switch_port["number"])].type
+        switch_port["vlan"] = configurations[switch_port["serial"],str(switch_port["number"])].vlan
+        switch_port["voiceVlan"] = configurations[switch_port["serial"],str(switch_port["number"])].voice_vlan
+        switch_port["allowedVlans"] = configurations[switch_port["serial"],str(switch_port["number"])].allowed_vlan
 
-        # print switch_port["enabled"]
 
-        print(switch_port["allowedVlans"])
-        result = merakiapi.updateswitchport(api_key, switch_port["serial"], switch_port["number"], switch_port["name"],
+        #print (switch_port["enabled"])
+
+
+        merakiapi.updateswitchport(api_key, switch_port["serial"], switch_port["number"], switch_port["name"],
                                    switch_port["tags"], switch_port["enabled"], switch_port["type"],
                                    switch_port["vlan"], switch_port["voiceVlan"], switch_port["allowedVlans"],
-                                   switch_port["poeEnabled"], "", switch_port["rstpEnabled"],
-                                   switch_port["stpGuard"],
+                                   switch_port["poeEnabled"], "", switch_port["rstpEnabled"], switch_port["stpGuard"],
                                    "")
+        progress_count += 1
+        progress_percent = '{:.1%}'.format(progress_count / progress_total)
+        print (progress_percent)
 
-        print(result)
-
-    archive_path = os.path.abspath(os.path.join('app', 'archive'))
-    shutil.copy(temp_path, archive_path)
-
+    os.rename(temp_path, "app/archive/justafile.xlsx")
     return "IT WORKS!"
 
 
 if __name__ == "__main__":
     main()
-
