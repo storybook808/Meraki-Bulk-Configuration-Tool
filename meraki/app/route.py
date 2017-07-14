@@ -88,6 +88,22 @@ def main():
             self.voice_vlan = row[11]
             self.allowed_vlan = row[12]
 
+    def time():
+        import time
+
+        date = time.strftime("%d/%m/%Y")
+        time = time.strftime("%H:%M:%S")
+
+        return date + " " + time
+
+    def sessionID():
+        import string
+        import random
+        
+        chars = string.ascii_uppercase
+        size = 10
+
+        return ''.join(random.choice(chars) for _ in range(size))
     # def main():
     #     # Pull the configurations.
     #     configurations = {}
