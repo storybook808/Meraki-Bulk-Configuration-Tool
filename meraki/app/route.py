@@ -6,12 +6,21 @@ from werkzeug import secure_filename
 
 @app.route('/uploader', methods=['GET', 'POST'])
 def upload_file():
+    import os
+
     if request.method == 'POST':
         current_dir = os.path.dirname(os.path.abspath(__file__))
         app.config['UPLOAD_FOLDER'] = os.path.join(current_dir, 'temp/')
         f = request.files['file']
         f.save(os.path.join(app.config['UPLOAD_FOLDER'],
                             secure_filename(f.filename)))
+        path = os.path.abspath(os.path.join('app', 'temp'))
+        current_file = os.listdir(path)
+        print(current_file)
+        if len(current_file) > 1:
+            os.remove(os.path.join(path, current_file[1]))
+            print("file removed brah")
+
         return 'FILE UPLOADED'
 
 @app.route('/')
@@ -145,8 +154,10 @@ def main():
     print(path)
     print(current_file)
     print(current_file[0])
-    print(os.path.join(path,current_file[0]))
-    temp_path = os.path.join(path,current_file[0])
+    print(os.path.join(path, current_file[0]))
+    temp_path = os.path.join(path, current_file[0])
+    if len(current_file) > 1:
+        extra_temp_file = os.path.join(path, current_file[1])
     file_1 = open(temp_path)
     csv_1 = csv.reader(file_1)
     for row in csv_1:
@@ -233,7 +244,7 @@ def main():
 
         print(result)
 
-    shutil.move(temp_path, "app/archive/justafile2.csv")
+    shutil.copy(extra_temp_file, "app/archive")
 
     return "IT WORKS!"
 
