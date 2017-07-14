@@ -1,19 +1,27 @@
 from app import app
-
 from flask import render_template, make_response, redirect, url_for, flash
-import os
+import os, shutil
 from werkzeug import secure_filename
 
 
 app.secret_key = 'some_secret'
 @app.route('/uploader', methods=['GET', 'POST'])
 def upload_file():
+    import os
+
     if request.method == 'POST':
         current_dir = os.path.dirname(os.path.abspath(__file__))
         app.config['UPLOAD_FOLDER'] = os.path.join(current_dir, 'temp/')
         f = request.files['file']
         f.save(os.path.join(app.config['UPLOAD_FOLDER'],
                             secure_filename(f.filename)))
+        path = os.path.abspath(os.path.join('app', 'temp'))
+        current_file = os.listdir(path)
+        print(current_file)
+        if len(current_file) > 1:
+            os.remove(os.path.join(path, current_file[1]))
+            print("file removed brah")
+
         return 'FILE UPLOADED'
 
 @app.route('/')
@@ -264,8 +272,8 @@ def main():
     print(path)
     print(current_file)
     print(current_file[0])
-    print(os.path.join(path,current_file[0]))
-    temp_path = os.path.join(path,current_file[0])
+    print(os.path.join(path, current_file[0]))
+    temp_path = os.path.join(path, current_file[0])
     file_1 = open(temp_path)
     csv_1 = csv.reader(file_1)
     for row in csv_1:
@@ -352,7 +360,9 @@ def main():
 
         print(result)
 
-    os.rename(temp_path, "app/archive/justafile.csv")
+    archive_path = os.path.abspath(os.path.join('app', 'archive'))
+    shutil.copy(temp_path, archive_path)
+
     return "IT WORKS!"
 
 
