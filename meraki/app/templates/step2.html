@@ -41,8 +41,27 @@
                 </div>
             </div>
         </div>
+
         <div class="ui centered container" style="text-align: center; vertical-align: middle;
 line-height: 90px; padding-top: 100px">
+
+            <!-- Display error messages for what is wrong -->
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <ul class = flashes>
+                    <div class="ui negative message">
+                        <div class="header">
+                            ERROR!
+                        </div>
+                        {% for message in messages %}
+                        <center>{{message}}</center>
+                    {% endfor %}
+                    </div>
+                </ul>
+                {% endif %}
+            {% endwith %}
+
+
             <h2>
                 Load configuration
             </h2>
@@ -65,8 +84,9 @@ line-height: 90px; padding-top: 100px">
                 </button>
 
                 <button class="ui right floated blue button">
-                    Validate
+                    <div class="title"><a href="/index/">Validate</a></div>
                 </button>
+
 
 
             </h4>
