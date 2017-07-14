@@ -1,6 +1,6 @@
 from app import app
 from flask import render_template, request, redirect, url_for
-import os
+import os, shutil
 from werkzeug import secure_filename
 
 
@@ -233,7 +233,8 @@ def main():
 
         print(result)
 
-    os.rename(temp_path, "app/archive/justafile.csv")
+    shutil.move(temp_path, "app/archive/justafile2.csv")
+
     return "IT WORKS!"
 
 
