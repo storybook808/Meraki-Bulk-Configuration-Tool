@@ -1,0 +1,8 @@
+Hostname,Serial Number,Port Number,Name,Tags,Enabled,RSTP,STP Guard,PoE,Type,VLAN,Voice VLAN,Allowed VLANs
+TestName1,11111111,Port1,Name1,tag1,Yes,NO,NO,YES,TYPE,VLAN,Vlan1,2
+TestName2,22222222,Port2,Name2,tag2,Yes,NO,NO,YES,TYPE,VLAN,Vlan2,3
+TestName3,33333333,Port3,Name3,tag3,Yes,NO,NO,YES,TYPE,VLAN,Vlan3,4
+TestName4,44444444,Port4,Name4,tag4,Yes,NO,NO,YES,TYPE,VLAN,Vlan4,5
+TestName5,55555555,Port5,Name5,tag5,Yes,NO,NO,YES,TYPE,VLAN,Vlan5,6
+TestName6,66666666,Port6,Name6,tag6,Yes,NO,NO,YES,TYPE,VLAN,Vlan6,7
+TestName7,77777777,Port7,Name7,tag7,Yes,NO,NO,YES,TYPE,VLAN,Vlan7,8
