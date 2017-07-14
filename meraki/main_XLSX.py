@@ -1,6 +1,7 @@
 import csv
 import merakiapi
 import openpyxl
+import cherrypy
 
 class Device:
     def __init__(self, row):
@@ -112,6 +113,8 @@ def main():
         else:
             th_count -= 1
 
+    total_progress = valid_row - 1 # variable use for monitoring program execution progress
+
     ### create dictionary for switch port ###
     my_row = []
     i = 0
@@ -185,6 +188,7 @@ def main():
     # print (switch_ports)
 
     # Apply configuration to the devices and push them to Meraki.
+    current_progress = 0
     for switch_port in switch_ports:
         try:
             switch_port["name"] = configurations[switch_port["serial"],str(switch_port["number"])].name
@@ -201,8 +205,11 @@ def main():
         switch_port["allowedVlans"] = configurations[switch_port["serial"],str(switch_port["number"])].allowed_vlan
 
 
-        print (switch_port["enabled"])
+        # print (switch_port["enabled"])
 
+        current_progress += 1
+        progressbar = "{:.0%}".format(current_progress / total_progress)
+        print(progressbar)
 
         merakiapi.updateswitchport(api_key, switch_port["serial"], switch_port["number"], switch_port["name"],
                                    switch_port["tags"], switch_port["enabled"], switch_port["type"],
