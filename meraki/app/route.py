@@ -26,7 +26,9 @@ def upload_file():
             os.remove(os.path.join(path, current_file[1]))
             print("file removed brah")
 
-        return 'FILE UPLOADED'
+        flash('file has been uploaded')
+
+        return redirect(url_for('step2'))
 
 #route to step1 page
 @app.route('/')
@@ -48,8 +50,10 @@ def step3():
 @app.route('/index/')
 def validate_form():
     import xlrd
+    path = os.path.abspath(os.path.join('app', 'temp'))
+    current_file = os.listdir(path)
     #open up working excel file to validate.
-    workbook = xlrd.open_workbook('testing.xlsx')
+    workbook = xlrd.open_workbook(current_file[0])
     worksheet = workbook.sheet_by_index(0)
 
     flag = 0
@@ -276,7 +280,7 @@ def main():
     #
     #     return
 
-    file_rename()
+    #file_rename()
     ### Find file path to pull configurations ###
     path = os.path.abspath(os.path.join('app', 'temp'))
     # path = os.path.join(initial_path, 'temp')
