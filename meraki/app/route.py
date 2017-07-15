@@ -1,8 +1,9 @@
 from app import app
 from flask import render_template, request, redirect, url_for
-import os
 from werkzeug import secure_filename
+import os, shutil
 import openpyxl
+
 
 @app.route('/uploader', methods=['GET', 'POST'])
 def upload_file():
@@ -13,6 +14,7 @@ def upload_file():
         f.save(os.path.join(app.config['UPLOAD_FOLDER'],
                             secure_filename(f.filename)))
         return 'FILE UPLOADED'
+
 
 @app.route('/')
 @app.route('/step1.html')
@@ -45,7 +47,7 @@ def download_csv():
 @app.route('/main', methods=['POST'])
 def main():
     import merakiapi
-    import os
+    import shutil
 
     class Device:
         def __init__(self, row):
@@ -94,16 +96,31 @@ def main():
         date = time.strftime("%d/%m/%Y")
         time = time.strftime("%H:%M:%S")
 
-        return date + " " + time
+        return date + "_" + time
 
     def sessionID():
         import string
         import random
-        
+
         chars = string.ascii_uppercase
         size = 10
 
         return ''.join(random.choice(chars) for _ in range(size))
+
+    def file_rename():
+
+        path = os.path.abspath(os.path.join('app', 'temp'))
+        current_file = os.listdir(path)
+        print("file_RE_NAME")
+        print(current_file)
+        print(os.path.abspath(os.path.join('temp', current_file[0])))
+        rename_src_path = os.path.abspath(os.path.join("app","temp", current_file[0]))
+        rename_dst_path = os.path.abspath(
+            os.path.join('app', 'temp', current_file[0].replace(".xslx", "") + "_" + sessionID() + "_" + time() + ".xslx"))
+        new_name = shutil.move(rename_src_path, rename_dst_path)
+        print(new_name)
+        return None
+
     # def main():
     #     # Pull the configurations.
     #     configurations = {}
@@ -147,7 +164,7 @@ def main():
     #
     #     return
 
-
+    file_rename()
     ### Find file path to pull configurations ###
     path = os.path.abspath(os.path.join('app', 'temp'))
     # path = os.path.join(initial_path, 'temp')
@@ -157,7 +174,7 @@ def main():
     # print(current_file)
     print(current_file[0])
     print(os.path.join(path, current_file[0]))
-    temp_path = os.path.join(path, current_file[0]) # path of configuration file
+    temp_path = os.path.join(path, current_file[0])  # path of configuration file
 
     ### Pull the configurations. ###
     configurations = {}
@@ -184,7 +201,7 @@ def main():
         else:
             th_count -= 1
 
-    progress_total = valid_row - 1 # save total number of excel entries to track for progress while compiling
+    progress_total = valid_row - 1  # save total number of excel entries to track for progress while compiling
     progress_count = 0  # initialize variable for progress count
 
     ### create dictionary for switch port ###
@@ -201,7 +218,8 @@ def main():
         else:
             for j in range(1, 14):  # max column number
                 my_row.append(ws.cell(row=i, column=j).value)
-            configurations[ws.cell(row=i, column=2).value, str(ws.cell(row=i, column=3).value)] = SwitchPort(my_row)  # dictionary
+            configurations[ws.cell(row=i, column=2).value, str(ws.cell(row=i, column=3).value)] = SwitchPort(
+                my_row)  # dictionary
             # print(ws.cell(row = i, column = 2).value , str(ws.cell(row = i, column=3).value))
             # print(my_row)
             my_row = []  # reset
@@ -227,7 +245,6 @@ def main():
 
     if org_id == "":
         print("Organization not found.")
-
 
     ### Pull the networks associated with the organization. ###
     networks = merakiapi.getnetworklist(api_key, org_id, True)
@@ -258,21 +275,20 @@ def main():
     ### Apply configuration to the devices and push them to Meraki. ###
     for switch_port in switch_ports:
         try:
-            switch_port["name"] = configurations[switch_port["serial"],str(switch_port["number"])].name
+            switch_port["name"] = configurations[switch_port["serial"], str(switch_port["number"])].name
         except:
             continue
-        switch_port["tags"]  = configurations[switch_port["serial"],str(switch_port["number"])].tags
-        switch_port["enabled"] = configurations[switch_port["serial"],str(switch_port["number"])].enabled
-        switch_port["rstpEnabled"] = configurations[switch_port["serial"],str(switch_port["number"])].rstp
-        switch_port["stpGuard"] = configurations[switch_port["serial"],str(switch_port["number"])].stp_guard
-        switch_port["poeEnabled"] = configurations[switch_port["serial"],str(switch_port["number"])].poe
-        switch_port["type"] = configurations[switch_port["serial"],str(switch_port["number"])].type
-        switch_port["vlan"] = configurations[switch_port["serial"],str(switch_port["number"])].vlan
-        switch_port["voiceVlan"] = configurations[switch_port["serial"],str(switch_port["number"])].voice_vlan
-        switch_port["allowedVlans"] = configurations[switch_port["serial"],str(switch_port["number"])].allowed_vlan
+        switch_port["tags"] = configurations[switch_port["serial"], str(switch_port["number"])].tags
+        switch_port["enabled"] = configurations[switch_port["serial"], str(switch_port["number"])].enabled
+        switch_port["rstpEnabled"] = configurations[switch_port["serial"], str(switch_port["number"])].rstp
+        switch_port["stpGuard"] = configurations[switch_port["serial"], str(switch_port["number"])].stp_guard
+        switch_port["poeEnabled"] = configurations[switch_port["serial"], str(switch_port["number"])].poe
+        switch_port["type"] = configurations[switch_port["serial"], str(switch_port["number"])].type
+        switch_port["vlan"] = configurations[switch_port["serial"], str(switch_port["number"])].vlan
+        switch_port["voiceVlan"] = configurations[switch_port["serial"], str(switch_port["number"])].voice_vlan
+        switch_port["allowedVlans"] = configurations[switch_port["serial"], str(switch_port["number"])].allowed_vlan
 
-
-        #print (switch_port["enabled"])
+        # print (switch_port["enabled"])
 
 
         merakiapi.updateswitchport(api_key, switch_port["serial"], switch_port["number"], switch_port["name"],
@@ -282,9 +298,11 @@ def main():
                                    "")
         progress_count += 1
         progress_percent = '{:.1%}'.format(progress_count / progress_total)
-        print (progress_percent)
+        print(progress_percent)
 
-    os.rename(temp_path, "app/archive/justafile.xlsx")
+    archive_path = os.path.abspath(os.path.join('app', 'archive'))
+    shutil.copy(temp_path, archive_path)
+
     return "IT WORKS!"
 
 
