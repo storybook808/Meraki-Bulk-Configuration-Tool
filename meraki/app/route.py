@@ -1,9 +1,13 @@
 from app import app
-from flask import render_template, request, redirect, url_for
+
+from flask import render_template, make_response, redirect, url_for, flash
 import os
 from werkzeug import secure_filename
 import openpyxl
 
+app.secret_key = 'some_secret'
+
+#route to file uploader
 @app.route('/uploader', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
@@ -14,32 +18,132 @@ def upload_file():
                             secure_filename(f.filename)))
         return 'FILE UPLOADED'
 
+#route to step1 page
 @app.route('/')
 @app.route('/step1.html')
 def step1():
     return render_template('step1.html')
 
-
+#route to step2 page
 @app.route('/step2.html')
 def step2():
     return render_template('step2.html')
 
-
+#route to step3 page
 @app.route('/step3.html')
 def step3():
     return render_template('step3.html')
 
+#route to validation script
+@app.route('/index/')
+def validate_form():
+    import xlrd
+    #open up working excel file to validate.
+    workbook = xlrd.open_workbook('testing.xlsx')
+    worksheet = workbook.sheet_by_index(0)
 
-''''@app.route('/csv/')
-def download_csv():
-    csv = 'Hostname,Serial Number,Port Number,Name,Tags,Enabled,RSTP,STP Guard,PoE,Type,VLAN,Voice VLAN,Allowed VLANs'
-    response = make_response(csv)
-    cd = 'attachment; filename=template.csv'
-    response.headers['Content-Disposition'] = cd
-    response.mimetype = 'text/csv'
+    flag = 0
 
-    return response
-'''
+    # for T/F values: Enabled, RSTP and PoE
+    for row in range(1, worksheet.nrows):
+        # grab value for enable
+        j = worksheet.cell_value(row, 5)
+        # grab value for RSTP
+        k = worksheet.cell_value(row, 6)
+        # grab value for PoE
+        m = worksheet.cell_value(row, 8)
+        if j == 1 or j == 0 or j == '':
+            pass
+        else:
+            flash('ERROR! Enabled must be either True or False')
+            flag += 1
+        if k == 1 or k == 0 or k == '':
+            pass
+        else:
+            flash('ERROR! RSTP must be either True or False')
+            flag += 1
+        if m == 1 or m == 0 or m == '':
+            pass
+        else:
+            flash('ERROR! PoE must be either True or False')
+            flag += 1
+
+        #for checking that serial # is a 12 alpha numberic string
+        # grab value for serial number
+        l = worksheet.cell(row, 1)
+        if (len(l.value.lower().replace('-', '')) == 12):
+            if l.ctype == 1 or l.ctype == 0:
+                pass
+            else:
+                flash("ERROR! Serial number must be a 12 character alpha numeric string")
+                flag += 1
+                #break
+        else:
+            flash("ERROR! Serial number must be a 12 character alpha numeric string")
+            flag += 1
+
+        # for checking that STP Guard must be 'disabled' 'root gound' or 'BPDU'
+        # grab value for STP Guard
+        n = worksheet.cell(row, 7)
+        if n.value.lower() == "disabled" or n.value.lower() == 'root guard' or n.value.lower() == 'bpdu guard' or n.value.lower() == '':
+            pass
+        else:
+            flash("""ERROR! STP Guard must be 'disabled' 'Root guard' or 'BPDU guard'""")
+            flag += 1
+
+        #for checking that Type is either access or trunk
+        # grab value for type
+        o = worksheet.cell(row, 9)
+        if o.value == "trunk" or o.value == "access" or o.value == '':
+            pass
+        else:
+            flash("ERROR! Type must be either access or trunk")
+            flag += 1
+
+        # for checking that VLAN is a number
+        # grab value for VLAN
+        p = worksheet.cell(row, 10)
+        # print(p.value)
+        if p.ctype == 0 or p.ctype == 2:
+            pass
+        else:
+            flash("ERROR! VLAN must be a number")
+            flag += 1
+
+        #for checking that Voice VLAN must be a number
+        # grab value for Voice VLAN
+        q = worksheet.cell(row, 11)
+        if q.ctype == 0 or q.ctype == 2:
+            pass
+        else:
+            flash("ERROR! Voice VLAN must be a number")
+            flag += 1
+
+
+        #for checking that Port # must be a number
+        # grab value for port #
+        r = worksheet.cell(row, 2)
+        if r.ctype == 0 or r.ctype == 2:
+            pass
+        else:
+            flash("ERROR! Port # must be a number")
+            flag += 1
+
+        #for checking that Allowed VLANs can be all or comma seperated numbers
+        # grab value for allowed VLANS
+        s = worksheet.cell(row, 12)
+        if s.ctype == 0 or s.ctype == 1 and s.value == 'all' or s.ctype == 2 or s.value == '':
+            pass
+        else:
+            flash("ERROR! Allowed VLANs must be 'all' or numbers")
+            flag += 1
+
+    # if no error messages then display validation complete
+    if flag == 0:
+        flash('Validation Complete')
+
+    # return same template page to display messages
+    return redirect(url_for('step2'))
 
 
 @app.route('/main', methods=['POST'])

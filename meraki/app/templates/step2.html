@@ -25,19 +25,19 @@
             <div class="completed step">
                 <div class="content">
                     <div class="title"><a href="step1.html">Step 1</a></div>
-                    <div class="description">Choose your shipping options</div>
+                    <div class="description">Download Template</div>
                 </div>
             </div>
             <div class="active step">
                 <div class="content">
                     <div class="title">Step 2</div>
-                    <div class="description">Enter billing information</div>
+                    <div class="description">Load Configuration</div>
                 </div>
             </div>
             <div class="step">
                 <div class="content">
                     <div class="title"><a href="step3.html">Step 3</a></div>
-                    <div class="description">Verify order details</div>
+                    <div class="description">Run</div>
                 </div>
             </div>
         </div>
@@ -49,10 +49,8 @@ line-height: 90px; padding-top: 100px">
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
                 <ul class = flashes>
-                    <div class="ui negative message">
-                        <div class="header">
-                            ERROR!
-                        </div>
+                    <div class="ui warning message">
+                        <div class="header"></div>
                         {% for message in messages %}
                         <center>{{message}}</center>
                     {% endfor %}
@@ -70,22 +68,17 @@ line-height: 90px; padding-top: 100px">
                 <form action="http://localhost:5000/uploader" method="POST"
                       enctype="multipart/form-data">
                     <input type="file" name="file"/>
-                    <button>SUBMIT</button>
+                    <button class="ui positive button">Upload</button>
                 </form>
 
                 <form action="http://localhost:5000/main" method="POST">
-                    <button>RUN</button>
+                    <button class="ui positive right floated button">Run</button>
                 </form>
 
-
-
-                <button class="ui right floated orange button">
-                    <div class="title"><a href="../step3.html">Run</a></div>
-                </button>
-
-                <button class="ui right floated blue button">
+                <button class="ui positive right floated button">
                     <div class="title"><a href="/index/">Validate</a></div>
                 </button>
+
 
 
 
