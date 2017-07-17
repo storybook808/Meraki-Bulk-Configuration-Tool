@@ -20,7 +20,7 @@
 
 import xlrd
 
-workbook = xlrd.open_workbook('testing.xlsx')
+workbook = xlrd.open_workbook('8P Port Configuration.xlsx')
 worksheet = workbook.sheet_by_index(0)
 
 flag = 0
@@ -111,8 +111,8 @@ for row in range(1, worksheet.nrows):
 
     #for checking that Allowed VLANs can be all or comma seperated numbers
     # grab value for allowed VLANS
-    allowed_vlan = worksheet.cell(row, 12)
-    if allowed_vlan.ctype == 0 or allowed_vlan.ctype == 1 and allowed_vlan.value == 'all' or allowed_vlan.ctype == 2 or allowed_vlan.value == '':
+    allowed_vlans = worksheet.cell(row, 12)
+    if allowed_vlans.ctype == 0 or allowed_vlans.ctype == 1 or allowed_vlans.value == 'all' or allowed_vlans.ctype == 2 or allowed_vlans.value == '':
         pass
     else:
         print("ERROR! Allowed VLANs must be 'all' or numbers")
