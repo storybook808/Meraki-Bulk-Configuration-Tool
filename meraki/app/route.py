@@ -253,7 +253,6 @@ def main():
 
         return ''.join(random.choice(chars) for _ in range(size))
 
-    # IN PROGRESS
     # file_rename Function
     # Purpose: renames files using the above time and sessionID functions
     # Param: None
@@ -270,11 +269,12 @@ def main():
         rename_dst_path = os.path.abspath(
             os.path.join('app', 'archive',
                          current_file[0].replace(".xlsx", "") + "_" + sessionID() + "_" + time() + ".xlsx"))
+        copy_dst_path = os.path.abspath(
+            os.path.join('app', 'temp',
+                         current_file[0].replace(".xlsx", "") + "_" + sessionID() + "_" + time() + ".xlsx"))
         shutil.copy(rename_src_path, rename_dst_path)
+        os.rename(rename_src_path, copy_dst_path)
 
-        # TO DO:
-        # needs to change name inside of temp folder to match the file copied into archive
-        os.rename(rename_src_path, rename_dst_path)
     # def main():
     #     # Pull the configurations.
     #     configurations = {}
