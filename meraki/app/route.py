@@ -15,6 +15,14 @@ def upload_file():
 
     if request.method == 'POST':
 
+        # Get the absolute path of the added file
+        path = os.path.abspath(os.path.join('app', 'temp'))
+        current_file = os.listdir(path)
+        if len(current_file) > 0:
+            # remove all files except the first
+            os.remove(os.path.join(path, current_file[0]))
+            print("file removed")
+
         # Obtain the absolute path to the file to upload using os module
         current_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -28,19 +36,10 @@ def upload_file():
         f.save(os.path.join(app.config['UPLOAD_FOLDER'],
                             secure_filename(f.filename)))
 
-        # Get the absolute path of the added file
-        path = os.path.abspath(os.path.join('app', 'temp'))
-        current_file = os.listdir(path)
-
         # Debug print, current_file should list all files within the temp folder
         print(current_file)
 
         # if there is more than a single file in the temp folder remove the extra files
-        if len(current_file) > 1:
-            # remove all files except the first
-            os.remove(os.path.join(path, current_file[1]))
-            print("file removed")
-
         flash('file has been uploaded')
 
         return redirect(url_for('step2'))
