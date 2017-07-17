@@ -53,8 +53,9 @@ def validate_form():
     #dictate path for excel file
     path = os.path.abspath(os.path.join('app', 'temp'))
     current_file = os.listdir(path)
+    print(path + current_file[0])
     #open up working excel file to validate.
-    workbook = xlrd.open_workbook(current_file[0])
+    workbook = xlrd.open_workbook(path + '/' + current_file[0])
     worksheet = workbook.sheet_by_index(0)
 
     flag = 0
