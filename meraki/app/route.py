@@ -91,7 +91,6 @@ def validate_form():
             else:
                 flash("ERROR! Serial number must be a 12 character alpha numeric string")
                 flag += 1
-                #break
         else:
             flash("ERROR! Serial number must be a 12 character alpha numeric string")
             flag += 1
