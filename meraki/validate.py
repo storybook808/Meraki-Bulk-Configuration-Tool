@@ -111,7 +111,7 @@ for row in range(1, worksheet.nrows):
 
     #for checking that Allowed VLANs can be all or comma seperated numbers
     # grab value for allowed VLANS
-    allowed_vlans = worksheet.cell(row, 12)
+    allowed_vlans = worksheet.cell(row, 12) 
     if allowed_vlans.ctype == 0 or allowed_vlans.ctype == 1 or allowed_vlans.value == 'all' or allowed_vlans.ctype == 2 or allowed_vlans.value == '':
         pass
     else:
