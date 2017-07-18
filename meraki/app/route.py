@@ -15,6 +15,14 @@ def upload_file():
 
     if request.method == 'POST':
 
+        # Get the absolute path of the added file
+        path = os.path.abspath(os.path.join('app', 'temp'))
+        current_file = os.listdir(path)
+        if len(current_file) > 0:
+            # remove all files except the first
+            os.remove(os.path.join(path, current_file[0]))
+            print("file removed")
+
         # Obtain the absolute path to the file to upload using os module
         current_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -28,19 +36,10 @@ def upload_file():
         f.save(os.path.join(app.config['UPLOAD_FOLDER'],
                             secure_filename(f.filename)))
 
-        # Get the absolute path of the added file
-        path = os.path.abspath(os.path.join('app', 'temp'))
-        current_file = os.listdir(path)
-
         # Debug print, current_file should list all files within the temp folder
         print(current_file)
 
         # if there is more than a single file in the temp folder remove the extra files
-        if len(current_file) > 1:
-            # remove all files except the first
-            os.remove(os.path.join(path, current_file[1]))
-            print("file removed")
-
         flash('file has been uploaded')
 
         return redirect(url_for('step2'))
@@ -271,16 +270,17 @@ def main():
 
         path = os.path.abspath(os.path.join('app', 'temp'))
         current_file = os.listdir(path)
+        id = sessionID()
         print("file_RE_NAME")
         print(current_file)
         print(os.path.abspath(os.path.join('temp', current_file[0])))
         rename_src_path = os.path.abspath(os.path.join("app", "temp", current_file[0]))
         rename_dst_path = os.path.abspath(
             os.path.join('app', 'archive',
-                         current_file[0].replace(".xlsx", "") + "_" + sessionID() + "_" + time() + ".xlsx"))
+                         current_file[0].replace(".xlsx", "") + "_" + id + "_" + time() + ".xlsx"))
         copy_dst_path = os.path.abspath(
             os.path.join('app', 'temp',
-                         current_file[0].replace(".xlsx", "") + "_" + sessionID() + "_" + time() + ".xlsx"))
+                         current_file[0].replace(".xlsx", "") + "_" + id + "_" + time() + ".xlsx"))
         shutil.copy(rename_src_path, rename_dst_path)
         os.rename(rename_src_path, copy_dst_path)
 
@@ -327,7 +327,7 @@ def main():
     #
     #     return
 
-    #file_rename()
+    file_rename()
     ### Find file path to pull configurations ###
     path = os.path.abspath(os.path.join('app', 'temp'))
     # path = os.path.join(initial_path, 'temp')
