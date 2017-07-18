@@ -270,16 +270,17 @@ def main():
 
         path = os.path.abspath(os.path.join('app', 'temp'))
         current_file = os.listdir(path)
+        id = sessionID()
         print("file_RE_NAME")
         print(current_file)
         print(os.path.abspath(os.path.join('temp', current_file[0])))
         rename_src_path = os.path.abspath(os.path.join("app", "temp", current_file[0]))
         rename_dst_path = os.path.abspath(
             os.path.join('app', 'archive',
-                         current_file[0].replace(".xlsx", "") + "_" + sessionID() + "_" + time() + ".xlsx"))
+                         current_file[0].replace(".xlsx", "") + "_" + id + "_" + time() + ".xlsx"))
         copy_dst_path = os.path.abspath(
             os.path.join('app', 'temp',
-                         current_file[0].replace(".xlsx", "") + "_" + sessionID() + "_" + time() + ".xlsx"))
+                         current_file[0].replace(".xlsx", "") + "_" + id + "_" + time() + ".xlsx"))
         shutil.copy(rename_src_path, rename_dst_path)
         os.rename(rename_src_path, copy_dst_path)
 
@@ -326,7 +327,7 @@ def main():
     #
     #     return
 
-    #file_rename()
+    file_rename()
     ### Find file path to pull configurations ###
     path = os.path.abspath(os.path.join('app', 'temp'))
     # path = os.path.join(initial_path, 'temp')
