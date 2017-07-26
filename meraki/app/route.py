@@ -287,6 +287,7 @@ def main():
         # get the absolute path to the singleton file
         rename_src_path = os.path.abspath(os.path.join("app", "temp", current_file[0]))
         # get the absolute path to the destination folder, archive
+        # name the new file based on the time and a unique ID
         rename_dst_path = os.path.abspath(
             os.path.join('app', 'archive',
                          current_file[0].replace(".xlsx", "") + "_" + id + "_" + time() + ".xlsx"))
