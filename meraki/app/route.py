@@ -1,5 +1,5 @@
 from app import app
-from flask import render_template, make_response, redirect, url_for, flash, request
+from flask import render_template, session, redirect, url_for, flash, request
 import os
 from werkzeug import secure_filename
 import os, shutil
@@ -9,6 +9,13 @@ app.secret_key = 'some_secret'
 
 
 # route to file uploader
+
+@app.route('/progress')
+def progress():
+    global progress_percent
+    return progress_percent
+
+
 @app.route('/uploader', methods=['GET', 'POST'])
 def upload_file():
     import os
@@ -73,11 +80,11 @@ def validate_form():
     import xlrd
 
     # open up working excel file to validate.
-    #dictate path for excel file
+    # dictate path for excel file
     path = os.path.abspath(os.path.join('app', 'temp'))
     current_file = os.listdir(path)
     print(path + current_file[0])
-    #open up working excel file to validate.
+    # open up working excel file to validate.
     workbook = xlrd.open_workbook(path + '/' + current_file[0])
     worksheet = workbook.sheet_by_index(0)
 
@@ -268,21 +275,26 @@ def main():
 
     def file_rename():
 
+        # assign a path based to the temp folder
         path = os.path.abspath(os.path.join('app', 'temp'))
+        # get a list of all files in temp
+        # this should only be a single file
         current_file = os.listdir(path)
         id = sessionID()
-        print("file_RE_NAME")
-        print(current_file)
+        # print("file_RE_NAME")
+        # print(current_file)
         print(os.path.abspath(os.path.join('temp', current_file[0])))
+        # get the absolute path to the singleton file
         rename_src_path = os.path.abspath(os.path.join("app", "temp", current_file[0]))
+        # get the absolute path to the destination folder, archive
         rename_dst_path = os.path.abspath(
             os.path.join('app', 'archive',
                          current_file[0].replace(".xlsx", "") + "_" + id + "_" + time() + ".xlsx"))
+
         copy_dst_path = os.path.abspath(
-            os.path.join('app', 'temp',
-                         current_file[0].replace(".xlsx", "") + "_" + id + "_" + time() + ".xlsx"))
+            os.path.join('app', 'temp', current_file[0]))
         shutil.copy(rename_src_path, rename_dst_path)
-        os.rename(rename_src_path, copy_dst_path)
+        os.replace(rename_src_path, copy_dst_path)
 
     # def main():
     #     # Pull the configurations.
@@ -367,16 +379,16 @@ def main():
     progress_total = valid_row - 1  # save total number of excel entries to track for progress while compiling
     progress_count = 0  # initialize variable for progress count
 
-    ### create dictionary for switch port ###
+    # create dictionary for switch port
     my_row = []
     i = 0
-    while (valid_row != 0):
+    while valid_row != 0:
         i += 1
-        if (ws.cell(row=i, column=2).value == None and ws.cell(row=i, column=3).value != None):
+        if ws.cell(row=i, column=2).value == None and ws.cell(row=i, column=3).value != None:
             pass
-        elif (ws.cell(row=i, column=2).value != None and ws.cell(row=i, column=3).value == None):
+        elif ws.cell(row=i, column=2).value != None and ws.cell(row=i, column=3).value == None:
             pass
-        elif (ws.cell(row=i, column=2).value == None and ws.cell(row=i, column=3).value == None):
+        elif ws.cell(row=i, column=2).value == None and ws.cell(row=i, column=3).value == None:
             pass
         else:
             for j in range(1, 14):  # max column number
