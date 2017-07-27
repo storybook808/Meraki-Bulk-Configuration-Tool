@@ -1,227 +1,14 @@
-from app import app
-<<<<<<< HEAD
-from flask import render_template
-=======
-from flask import render_template, session, redirect, url_for, flash, request
-import os
-from werkzeug import secure_filename
+from flask import Blueprint
+import merakiapi
 import os, shutil
->>>>>>> 860647cba8bb3e11149b94e0b52cdde61149477e
 
-app.secret_key = 'some_secret'
-
-
-# route to file uploader
-<<<<<<< HEAD
-=======
-
-@app.route('/progress')
-def progress():
-    global progress_percent
-    return progress_percent
-
-
-@app.route('/uploader', methods=['GET', 'POST'])
-def upload_file():
-    import os
-
-    if request.method == 'POST':
-
-        # Get the absolute path of the added file
-        path = os.path.abspath(os.path.join('app', 'temp'))
-        current_file = os.listdir(path)
-        if len(current_file) > 0:
-            # remove all files except the first
-            os.remove(os.path.join(path, current_file[0]))
-            print("file removed")
-
-        # Obtain the absolute path to the file to upload using os module
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-
-        # Save the uploaded file into the path specified
-        # This path saves it into the current directory, then uses the join method
-        # To put the file into the temp folder
-        app.config['UPLOAD_FOLDER'] = os.path.join(current_dir, 'temp/')
-        f = request.files['file']
-
-        # Save the file in temp
-        f.save(os.path.join(app.config['UPLOAD_FOLDER'],
-                            secure_filename(f.filename)))
-
-        # Debug print, current_file should list all files within the temp folder
-        print(current_file)
-
-        # if there is more than a single file in the temp folder remove the extra files
-
-        if len(current_file) > 1:
-            # remove all files except the first
-            os.remove(os.path.join(path, current_file[1]))
-            print("file removed")
-
-        flash('File has been uploaded')
-
-
-        return redirect(url_for('step2'))
-
-
->>>>>>> 860647cba8bb3e11149b94e0b52cdde61149477e
-# Route to step1 page
-# Formats the step1.html page
-
-
-@app.route('/')
-@app.route('/step1.html')
-def step1():
-    return render_template('step1.html')
-
-
-# Route to step2 page
-# Formats the step2.html page
-@app.route('/step2.html')
-def step2():
-    return render_template('step2.html')
-
-
-# Route to step3 page
-# Formats the step1.html page
-@app.route('/step3.html')
-def step3():
-    return render_template('step3.html')
-
-
-<<<<<<< HEAD
-=======
-# Route to step2a page where we enter organization name
-@app.route('/step2a.html')
-def step2a():
-    return render_template('step2a.html')
-
-
-# Route to validation script
-@app.route('/index/')
-def validate_form():
-    import xlrd
-
-    # open up working excel file to validate.
-    # dictate path for excel file
-    path = os.path.abspath(os.path.join('app', 'temp'))
-    current_file = os.listdir(path)
-    print(path + current_file[0])
-    # open up working excel file to validate.
-    workbook = xlrd.open_workbook(path + '/' + current_file[0])
-    worksheet = workbook.sheet_by_index(0)
-
-    flag = 0
-
-    # for T/F values: Enabled, RSTP and PoE
-    for row in range(1, worksheet.nrows):
-        # grab value for enable
-        enable = worksheet.cell_value(row, 5)
-        # grab value for RSTP
-        rstp = worksheet.cell_value(row, 6)
-        # grab value for PoE
-        poe = worksheet.cell_value(row, 8)
-        if enable == 1 or enable == 0 or enable == '':
-            pass
-        else:
-            flash('ERROR! Enabled must be either True or False')
-            flag += 1
-        if rstp == 1 or rstp == 0 or rstp == '':
-            pass
-        else:
-            flash('ERROR! RSTP must be either True or False')
-            flag += 1
-        if poe == 1 or poe == 0 or poe == '':
-            pass
-        else:
-            flash('ERROR! PoE must be either True or False')
-            flag += 1
-
-        # for checking that serial # is a 12 alpha numberic string
-        # grab value for serial number
-        serial_number = worksheet.cell(row, 1)
-        if (len(serial_number.value.lower().replace('-', '')) == 12):
-            if serial_number.ctype == 1 or serial_number.ctype == 0:
-                pass
-            else:
-                flash("ERROR! Serial number must be a 12 character alpha numeric string")
-                flag += 1
-
-                # break
-
-        else:
-            flash("ERROR! Serial number must be a 12 character alpha numeric string")
-            flag += 1
-
-        # for checking that STP Guard must be 'disabled' 'root gound' or 'BPDU'
-        # grab value for STP Guard
-        stp_guard = worksheet.cell(row, 7)
-        if stp_guard.value.lower() == "disabled" or stp_guard.value.lower() == 'root guard' or stp_guard.value.lower() == 'bpdu guard' or stp_guard.value.lower() == '':
-            pass
-        else:
-            flash("""ERROR! STP Guard must be 'disabled' 'Root guard' or 'BPDU guard'""")
-            flag += 1
-
-        # for checking that Type is either access or trunk
-        # grab value for type
-        type = worksheet.cell(row, 9)
-        if type.value == "trunk" or type.value == "access" or type.value == '':
-            pass
-        else:
-            flash("ERROR! Type must be either access or trunk")
-            flag += 1
-
-        # for checking that VLAN is a number
-        # grab value for VLAN
-        vlan = worksheet.cell(row, 10)
-        if vlan.ctype == 0 or vlan.ctype == 2:
-            pass
-        else:
-            flash("ERROR! VLAN must be a number")
-            flag += 1
-
-        # for checking that Voice VLAN must be a number
-        # grab value for Voice VLAN
-        voice_vlan = worksheet.cell(row, 11)
-        if voice_vlan.ctype == 0 or voice_vlan.ctype == 2:
-            pass
-        else:
-            flash("ERROR! Voice VLAN must be a number")
-            flag += 1
-
-        # for checking that Port # must be a number
-        # grab value for port #
-        port_number = worksheet.cell(row, 2)
-        if port_number.ctype == 0 or port_number.ctype == 2:
-            pass
-        else:
-            flash("ERROR! Port # must be a number")
-            flag += 1
-
-        # for checking that Allowed VLANs can be all or comma seperated numbers
-        # grab value for allowed VLANS
-        allowed_vlan = worksheet.cell(row, 12)
-        if allowed_vlan.ctype == 0 or allowed_vlan.ctype == 1 or allowed_vlan.value == 'all' or allowed_vlan.ctype == 2 or allowed_vlan.value == '':
-            pass
-        else:
-            flash("ERROR! Allowed VLANs must be 'all' or numbers")
-            flag += 1
-
-    # if no error messages then display validation complete
-    if flag == 0:
-        flash('Validation Complete')
-
-    # return same template page to display messages
-    return redirect(url_for('step2'))
+configure_blueprint = Blueprint('configure', __name__, template_folder='templates')
 
 
 # This function configures the meraki page
-@app.route('/main', methods=['POST'])
-def main():
-    import merakiapi
-    import shutil
-    from flask import Flask, stream_with_context, request, Response, flash
-    from time import sleep
+@configure_blueprint.route('/configure', methods=['POST'])
+def configure():
+
 
     class Device:
         def __init__(self, row):
@@ -514,8 +301,6 @@ def main():
 
     print(switch_ports)
 
-    global progress_percent
-
     ### Apply configuration to the devices and push them to Meraki. ###
     for switch_port in switch_ports:
         try:
@@ -549,33 +334,8 @@ def main():
     file_rename()
     archive_limit()
 
-    #return render_template('step3.html')
-
-from flask import Flask, stream_with_context, request, Response, flash
-from time import sleep
-
-
-def stream_template(template_name, **context):
-    app.update_template_context(context)
-    t = app.jinja_env.get_template(template_name)
-    rv = t.stream(context)
-    rv.disable_buffering()
-    return rv
-
-def generate():
-    main()
-    for progress in range(1):
-        yield (progress_percent)
-        sleep(1)
-
-#from flask import flash
-
-@app.route('/stream')
-def stream_view():
-    rows = generate()
-    return Response(stream_template('step3.html', rows=rows))
+    return "IT WORKS!"
 
 
 if __name__ == "__main__":
     main()
->>>>>>> 860647cba8bb3e11149b94e0b52cdde61149477e
