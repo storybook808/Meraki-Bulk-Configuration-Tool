@@ -7,14 +7,22 @@
             src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.js"></script>
     <!--header image-->
     <div class="ui small images">
-        <img class="ui image" src="http://pre15.deviantart.net/45e2/th/pre/i/2016/174/a/8/d__va_ult_logo_by_theriverblues-da7dla1.png">
-        <img class="ui image" src="http://pre15.deviantart.net/45e2/th/pre/i/2016/174/a/8/d__va_ult_logo_by_theriverblues-da7dla1.png">
-        <img class="ui image" src="http://pre15.deviantart.net/45e2/th/pre/i/2016/174/a/8/d__va_ult_logo_by_theriverblues-da7dla1.png">
-        <img class="ui image" src="http://pre15.deviantart.net/45e2/th/pre/i/2016/174/a/8/d__va_ult_logo_by_theriverblues-da7dla1.png">
-        <img class="ui image" src="http://pre15.deviantart.net/45e2/th/pre/i/2016/174/a/8/d__va_ult_logo_by_theriverblues-da7dla1.png">
-        <img class="ui image" src="http://pre15.deviantart.net/45e2/th/pre/i/2016/174/a/8/d__va_ult_logo_by_theriverblues-da7dla1.png">
-        <img class="ui image" src="http://pre15.deviantart.net/45e2/th/pre/i/2016/174/a/8/d__va_ult_logo_by_theriverblues-da7dla1.png">
-        <img class="ui image" src="http://pre15.deviantart.net/45e2/th/pre/i/2016/174/a/8/d__va_ult_logo_by_theriverblues-da7dla1.png">
+        <img class="ui image"
+             src="http://pre15.deviantart.net/45e2/th/pre/i/2016/174/a/8/d__va_ult_logo_by_theriverblues-da7dla1.png">
+        <img class="ui image"
+             src="http://pre15.deviantart.net/45e2/th/pre/i/2016/174/a/8/d__va_ult_logo_by_theriverblues-da7dla1.png">
+        <img class="ui image"
+             src="http://pre15.deviantart.net/45e2/th/pre/i/2016/174/a/8/d__va_ult_logo_by_theriverblues-da7dla1.png">
+        <img class="ui image"
+             src="http://pre15.deviantart.net/45e2/th/pre/i/2016/174/a/8/d__va_ult_logo_by_theriverblues-da7dla1.png">
+        <img class="ui image"
+             src="http://pre15.deviantart.net/45e2/th/pre/i/2016/174/a/8/d__va_ult_logo_by_theriverblues-da7dla1.png">
+        <img class="ui image"
+             src="http://pre15.deviantart.net/45e2/th/pre/i/2016/174/a/8/d__va_ult_logo_by_theriverblues-da7dla1.png">
+        <img class="ui image"
+             src="http://pre15.deviantart.net/45e2/th/pre/i/2016/174/a/8/d__va_ult_logo_by_theriverblues-da7dla1.png">
+        <img class="ui image"
+             src="http://pre15.deviantart.net/45e2/th/pre/i/2016/174/a/8/d__va_ult_logo_by_theriverblues-da7dla1.png">
     </div>
 
 </head>
@@ -47,16 +55,16 @@ line-height: 90px; padding-top: 100px">
 
             <!-- Display error messages for what is wrong -->
             {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                <ul class = flashes>
-                    <div class="ui warning message">
-                        <div class="header"></div>
-                        {% for message in messages %}
-                        <center>{{message}}</center>
+            {% if messages %}
+            <ul class=flashes>
+                <div class="ui warning message">
+                    <div class="header"></div>
+                    {% for message in messages %}
+                    <center>{{message}}</center>
                     {% endfor %}
-                    </div>
-                </ul>
-                {% endif %}
+                </div>
+            </ul>
+            {% endif %}
             {% endwith %}
 
 
@@ -65,25 +73,28 @@ line-height: 90px; padding-top: 100px">
             </h2>
             <h4> Choose an excel workbook to configure the switch </h4>
 
-                <form action="http://localhost:5000/uploader" method="POST"
-                      enctype="multipart/form-data">
-                    <input type="file" name="file"/>
-                    <button class="ui positive button">Upload</button>
-                </form>
+            <form action="http://localhost:5000/uploader" method="POST"
+                  enctype="multipart/form-data">
+                <input type="file" name="file"/>
+                <button class="ui positive button">Upload</button>
+            </form>
 
-                <form action="http://localhost:5000/main" method="POST">
-                    <button class="ui positive right floated button">Run</button>
-                </form>
+            <div class=" ui containter">
+                <a href="step3.html">
+                    <button class="ui right floated blue button" style="margin-right: 100px; margin-bottom: 50px;">
+                        Next
+                    </button>
+                </a>
+            </div>
 
-                <button class="ui positive right floated button">
-                    <div class="title"><a href="/index/">Validate</a></div>
-                </button>
-
-
+            <button class="ui positive right floated button">
+                <div class="title"><a href="/index/">Validate</a></div>
+            </button>
 
 
             </h4>
         </div>
+
     </div>
 </div>
 </body>
