@@ -1,5 +1,5 @@
 from app import app
-from flask import render_template, make_response, redirect, url_for, flash, request
+from flask import render_template, session, redirect, url_for, flash, request
 import os
 from werkzeug import secure_filename
 import os, shutil
@@ -9,6 +9,13 @@ app.secret_key = 'some_secret'
 
 
 # route to file uploader
+
+@app.route('/progress')
+def progress():
+    global progress_percent
+    return progress_percent
+
+
 @app.route('/uploader', methods=['GET', 'POST'])
 def upload_file():
     import os
@@ -73,11 +80,11 @@ def validate_form():
     import xlrd
 
     # open up working excel file to validate.
-    #dictate path for excel file
+    # dictate path for excel file
     path = os.path.abspath(os.path.join('app', 'temp'))
     current_file = os.listdir(path)
     print(path + current_file[0])
-    #open up working excel file to validate.
+    # open up working excel file to validate.
     workbook = xlrd.open_workbook(path + '/' + current_file[0])
     worksheet = workbook.sheet_by_index(0)
 
@@ -252,14 +259,14 @@ def main():
     # switch is related to
     # Param: None
     # Output: 10 character string of uppercase chars
-    def sessionID():
-        import string
-        import random
+    # def sessionID():
+    #   import string
+    #    import random
 
-        chars = string.ascii_uppercase
-        size = 10
+    #    chars = string.ascii_uppercase
+    #    size = 4
 
-        return ''.join(random.choice(chars) for _ in range(size))
+    #    return ''.join(random.choice(chars) for _ in range(size))
 
     # file_rename Function
     # Purpose: renames files using the above time and sessionID functions
@@ -268,21 +275,69 @@ def main():
 
     def file_rename():
 
+        # assign a path based to the temp folder
         path = os.path.abspath(os.path.join('app', 'temp'))
+        # get a list of all files in temp
+        # this should only be a single file
         current_file = os.listdir(path)
-        id = sessionID()
-        print("file_RE_NAME")
-        print(current_file)
+        # id = sessionID()
+        # print("file_RE_NAME")
+        # print(current_file)
         print(os.path.abspath(os.path.join('temp', current_file[0])))
+        # get the absolute path to the singleton file
         rename_src_path = os.path.abspath(os.path.join("app", "temp", current_file[0]))
+        # get the absolute path to the destination folder, archive
+        # name the new file based on the time and a unique ID
         rename_dst_path = os.path.abspath(
             os.path.join('app', 'archive',
-                         current_file[0].replace(".xlsx", "") + "_" + id + "_" + time() + ".xlsx"))
+                         current_file[0].replace(".xlsx", "") + "_" + time() + ".xlsx"))
+
         copy_dst_path = os.path.abspath(
-            os.path.join('app', 'temp',
-                         current_file[0].replace(".xlsx", "") + "_" + id + "_" + time() + ".xlsx"))
+            os.path.join('app', 'temp', current_file[0]))
         shutil.copy(rename_src_path, rename_dst_path)
-        os.rename(rename_src_path, copy_dst_path)
+        os.replace(rename_src_path, copy_dst_path)
+
+
+       # if len(archive_folder) > 2:
+        #    while len(archive_folder) > 2:
+        #        os.remove(os.path.join(archive_path, archive_folder[0]))
+
+    # archive_limit() Function
+    # Purpose: limits the amount of files allowed in the archive folder
+    # preventing the archive folder becoming unnecessarily large
+    # Param: None
+    # Output: None, but files will be removed
+    def archive_limit():
+
+        # set a counter varible for use in the while loop
+        counter = 0
+
+        # declare a path to the archive folder
+        archive_path = os.path.abspath(os.path.join('app', 'archive'))
+
+        # using the archive_path list the elements of the archive folder using os.listdir(path)
+        archive_folder = os.listdir(archive_path)
+
+        # initialize a list to hold the files that will be sorted/delted
+        arch_folder_path_list = []
+
+        # populate the list
+        for i in range(len(archive_folder)):
+            arch_folder_path_list.append(os.path.join(archive_path, archive_folder[i]))
+        # using a bubble sort, sort the list based on the date last modified
+        for j in range(len(arch_folder_path_list)):
+            for k in range(len(arch_folder_path_list)-1, j, -1):
+                if os.path.getmtime(arch_folder_path_list[k]) < os.path.getmtime(arch_folder_path_list[k-1]):
+                    arch_folder_path_list[k], arch_folder_path_list[k-1] = arch_folder_path_list[k-1], arch_folder_path_list[k]
+
+        # if the size of the list is over 20 delete the oldest files until the file size is 20
+        if len(arch_folder_path_list) >= 20:
+            while len(arch_folder_path_list) > 19:
+                os.remove(arch_folder_path_list[counter])
+                print(arch_folder_path_list[counter])
+                counter += 1
+                if counter == 19:
+                    break
 
     # def main():
     #     # Pull the configurations.
@@ -327,7 +382,6 @@ def main():
     #
     #     return
 
-    file_rename()
     ### Find file path to pull configurations ###
     path = os.path.abspath(os.path.join('app', 'temp'))
     # path = os.path.join(initial_path, 'temp')
@@ -367,16 +421,16 @@ def main():
     progress_total = valid_row - 1  # save total number of excel entries to track for progress while compiling
     progress_count = 0  # initialize variable for progress count
 
-    ### create dictionary for switch port ###
+    # create dictionary for switch port
     my_row = []
     i = 0
-    while (valid_row != 0):
+    while valid_row != 0:
         i += 1
-        if (ws.cell(row=i, column=2).value == None and ws.cell(row=i, column=3).value != None):
+        if ws.cell(row=i, column=2).value == None and ws.cell(row=i, column=3).value != None:
             pass
-        elif (ws.cell(row=i, column=2).value != None and ws.cell(row=i, column=3).value == None):
+        elif ws.cell(row=i, column=2).value != None and ws.cell(row=i, column=3).value == None:
             pass
-        elif (ws.cell(row=i, column=2).value == None and ws.cell(row=i, column=3).value == None):
+        elif ws.cell(row=i, column=2).value == None and ws.cell(row=i, column=3).value == None:
             pass
         else:
             for j in range(1, 14):  # max column number
@@ -465,6 +519,8 @@ def main():
 
     archive_path = os.path.abspath(os.path.join('app', 'archive'))
     shutil.copy(temp_path, archive_path)
+    file_rename()
+    archive_limit()
 
     return "IT WORKS!"
 
