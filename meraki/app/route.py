@@ -302,39 +302,42 @@ def main():
         #    while len(archive_folder) > 2:
         #        os.remove(os.path.join(archive_path, archive_folder[0]))
 
+    # archive_limit() Function
+    # Purpose: limits the amount of files allowed in the archive folder
+    # preventing the archive folder becoming unnecessarily large
+    # Param: None
+    # Output: None, but files will be removed
     def archive_limit():
 
+        # set a counter varible for use in the while loop
         counter = 0
+
+        # declare a path to the archive folder
         archive_path = os.path.abspath(os.path.join('app', 'archive'))
+
+        # using the archive_path list the elements of the archive folder using os.listdir(path)
         archive_folder = os.listdir(archive_path)
+
+        # initialize a list to hold the files that will be sorted/delted
         arch_folder_path_list = []
+
+        # populate the list
         for i in range(len(archive_folder)):
             arch_folder_path_list.append(os.path.join(archive_path, archive_folder[i]))
+        # using a bubble sort, sort the list based on the date last modified
         for j in range(len(arch_folder_path_list)):
             for k in range(len(arch_folder_path_list)-1, j, -1):
-            #print("The time that: " + repr(arch_folder[j]) + "was created was: " + repr(os.path.getmtime(arch_folder[j])))
-            #sorted_arch_folder = sorted(arch_folder, key=lambda x: os.path.getmtime(arch_folder_path_list[j]))
                 if os.path.getmtime(arch_folder_path_list[k]) < os.path.getmtime(arch_folder_path_list[k-1]):
                     arch_folder_path_list[k], arch_folder_path_list[k-1] = arch_folder_path_list[k-1], arch_folder_path_list[k]
-        print(arch_folder_path_list)
-        print(len(arch_folder_path_list))
-        if len(arch_folder_path_list) > 3:
-            while len(arch_folder_path_list) > 3:
+
+        # if the size of the list is over 20 delete the oldest files until the file size is 20
+        if len(arch_folder_path_list) >= 20:
+            while len(arch_folder_path_list) > 19:
                 os.remove(arch_folder_path_list[counter])
                 print(arch_folder_path_list[counter])
                 counter += 1
-                if counter == 3:
+                if counter == 19:
                     break
-
-
-
-       # archive_path = os.path.abspath(os.path.join('app', 'archive'))
-       # archive_folder = os.listdir(archive_path)
-       # print(archive_folder)
-       # for x in range(len(archive_folder)):
-       #     print(os.path.getmtime(archive_folder[x]))
-        #for x in range(len(archive_folder)):
-        #    print(os.path.getmtime(os.path.join(archive_path, archive_folder[x])))
 
     # def main():
     #     # Pull the configurations.
