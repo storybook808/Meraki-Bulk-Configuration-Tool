@@ -45,12 +45,12 @@
         <div class="ui centered container" style="text-align: center; vertical-align: middle;
 line-height: 90px; padding-top: 100px">
             <h2>
-                Progress Bar
+                Processing Data... Please Wait
             </h2>
-            <div class="ui indicating progress">
-                <div class="bar"></div>
-                <div class="label">Excecuting</div>
-            </div>
+            <div class="ui active centered inline loader">Loading</div>
+            {% for item in rows %}
+            <h1>{{ item }}</h1>
+            {% endfor %}
         </div>
     </div>
 </div>
