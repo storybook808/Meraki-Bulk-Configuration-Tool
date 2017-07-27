@@ -259,14 +259,14 @@ def main():
     # switch is related to
     # Param: None
     # Output: 10 character string of uppercase chars
-    def sessionID():
-        import string
-        import random
+    # def sessionID():
+    #   import string
+    #    import random
 
-        chars = string.ascii_uppercase
-        size = 10
+    #    chars = string.ascii_uppercase
+    #    size = 4
 
-        return ''.join(random.choice(chars) for _ in range(size))
+    #    return ''.join(random.choice(chars) for _ in range(size))
 
     # file_rename Function
     # Purpose: renames files using the above time and sessionID functions
@@ -280,7 +280,7 @@ def main():
         # get a list of all files in temp
         # this should only be a single file
         current_file = os.listdir(path)
-        id = sessionID()
+        # id = sessionID()
         # print("file_RE_NAME")
         # print(current_file)
         print(os.path.abspath(os.path.join('temp', current_file[0])))
@@ -290,12 +290,51 @@ def main():
         # name the new file based on the time and a unique ID
         rename_dst_path = os.path.abspath(
             os.path.join('app', 'archive',
-                         current_file[0].replace(".xlsx", "") + "_" + id + "_" + time() + ".xlsx"))
+                         current_file[0].replace(".xlsx", "") + "_" + time() + ".xlsx"))
 
         copy_dst_path = os.path.abspath(
             os.path.join('app', 'temp', current_file[0]))
         shutil.copy(rename_src_path, rename_dst_path)
         os.replace(rename_src_path, copy_dst_path)
+
+
+       # if len(archive_folder) > 2:
+        #    while len(archive_folder) > 2:
+        #        os.remove(os.path.join(archive_path, archive_folder[0]))
+
+    def archive_limit():
+
+        counter = 0
+        archive_path = os.path.abspath(os.path.join('app', 'archive'))
+        archive_folder = os.listdir(archive_path)
+        arch_folder_path_list = []
+        for i in range(len(archive_folder)):
+            arch_folder_path_list.append(os.path.join(archive_path, archive_folder[i]))
+        for j in range(len(arch_folder_path_list)):
+            for k in range(len(arch_folder_path_list)-1, j, -1):
+            #print("The time that: " + repr(arch_folder[j]) + "was created was: " + repr(os.path.getmtime(arch_folder[j])))
+            #sorted_arch_folder = sorted(arch_folder, key=lambda x: os.path.getmtime(arch_folder_path_list[j]))
+                if os.path.getmtime(arch_folder_path_list[k]) < os.path.getmtime(arch_folder_path_list[k-1]):
+                    arch_folder_path_list[k], arch_folder_path_list[k-1] = arch_folder_path_list[k-1], arch_folder_path_list[k]
+        print(arch_folder_path_list)
+        print(len(arch_folder_path_list))
+        if len(arch_folder_path_list) > 3:
+            while len(arch_folder_path_list) > 3:
+                os.remove(arch_folder_path_list[counter])
+                print(arch_folder_path_list[counter])
+                counter += 1
+                if counter == 3:
+                    break
+
+
+
+       # archive_path = os.path.abspath(os.path.join('app', 'archive'))
+       # archive_folder = os.listdir(archive_path)
+       # print(archive_folder)
+       # for x in range(len(archive_folder)):
+       #     print(os.path.getmtime(archive_folder[x]))
+        #for x in range(len(archive_folder)):
+        #    print(os.path.getmtime(os.path.join(archive_path, archive_folder[x])))
 
     # def main():
     #     # Pull the configurations.
@@ -340,7 +379,6 @@ def main():
     #
     #     return
 
-    file_rename()
     ### Find file path to pull configurations ###
     path = os.path.abspath(os.path.join('app', 'temp'))
     # path = os.path.join(initial_path, 'temp')
@@ -478,6 +516,8 @@ def main():
 
     archive_path = os.path.abspath(os.path.join('app', 'archive'))
     shutil.copy(temp_path, archive_path)
+    file_rename()
+    archive_limit()
 
     return "IT WORKS!"
 
