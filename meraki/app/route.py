@@ -3,7 +3,6 @@ from flask import render_template, make_response, redirect, url_for, flash, requ
 import os
 from werkzeug import secure_filename
 import os, shutil
-import openpyxl
 
 app.secret_key = 'some_secret'
 
@@ -41,7 +40,7 @@ def upload_file():
             os.remove(os.path.join(path, current_file[1]))
             print("file removed")
 
-        flash('file has been uploaded')
+        flash('File has been uploaded')
 
         return redirect(url_for('step2'))
 
@@ -68,17 +67,23 @@ def step3():
     return render_template('step3.html')
 
 
+# Route to step2a page where we enter organization name
+@app.route('/step2a.html')
+def step2a():
+    return render_template('step2a.html')
+
+
 # Route to validation script
 @app.route('/index/')
 def validate_form():
     import xlrd
 
     # open up working excel file to validate.
-    #dictate path for excel file
+    # dictate path for excel file
     path = os.path.abspath(os.path.join('app', 'temp'))
     current_file = os.listdir(path)
     print(path + current_file[0])
-    #open up working excel file to validate.
+    # open up working excel file to validate.
     workbook = xlrd.open_workbook(path + '/' + current_file[0])
     worksheet = workbook.sheet_by_index(0)
 
@@ -191,6 +196,8 @@ def validate_form():
 def main():
     import merakiapi
     import shutil
+    from flask import Flask, stream_with_context, request, Response, flash
+    from time import sleep
 
     class Device:
         def __init__(self, row):
@@ -327,7 +334,7 @@ def main():
     #
     #     return
 
-    #file_rename()
+    # file_rename()
     ### Find file path to pull configurations ###
     path = os.path.abspath(os.path.join('app', 'temp'))
     # path = os.path.join(initial_path, 'temp')
@@ -435,6 +442,8 @@ def main():
 
     print(switch_ports)
 
+    global progress_percent
+
     ### Apply configuration to the devices and push them to Meraki. ###
     for switch_port in switch_ports:
         try:
@@ -466,7 +475,31 @@ def main():
     archive_path = os.path.abspath(os.path.join('app', 'archive'))
     shutil.copy(temp_path, archive_path)
 
-    return "IT WORKS!"
+    #return render_template('step3.html')
+
+from flask import Flask, stream_with_context, request, Response, flash
+from time import sleep
+
+
+def stream_template(template_name, **context):
+    app.update_template_context(context)
+    t = app.jinja_env.get_template(template_name)
+    rv = t.stream(context)
+    rv.disable_buffering()
+    return rv
+
+def generate():
+    main()
+    for progress in range(1):
+        yield (progress_percent)
+        sleep(1)
+
+#from flask import flash
+
+@app.route('/stream')
+def stream_view():
+    rows = generate()
+    return Response(stream_template('step3.html', rows=rows))
 
 
 if __name__ == "__main__":
