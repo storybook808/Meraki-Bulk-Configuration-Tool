@@ -3,7 +3,6 @@ from flask import render_template, session, redirect, url_for, flash, request
 import os
 from werkzeug import secure_filename
 import os, shutil
-import openpyxl
 
 app.secret_key = 'some_secret'
 
@@ -47,7 +46,14 @@ def upload_file():
         print(current_file)
 
         # if there is more than a single file in the temp folder remove the extra files
-        flash('file has been uploaded')
+
+        if len(current_file) > 1:
+            # remove all files except the first
+            os.remove(os.path.join(path, current_file[1]))
+            print("file removed")
+
+        flash('File has been uploaded')
+
 
         return redirect(url_for('step2'))
 
@@ -72,6 +78,12 @@ def step2():
 @app.route('/step3.html')
 def step3():
     return render_template('step3.html')
+
+
+# Route to step2a page where we enter organization name
+@app.route('/step2a.html')
+def step2a():
+    return render_template('step2a.html')
 
 
 # Route to validation script
@@ -197,6 +209,8 @@ def validate_form():
 def main():
     import merakiapi
     import shutil
+    from flask import Flask, stream_with_context, request, Response, flash
+    from time import sleep
 
     class Device:
         def __init__(self, row):
@@ -489,6 +503,8 @@ def main():
 
     print(switch_ports)
 
+    global progress_percent
+
     ### Apply configuration to the devices and push them to Meraki. ###
     for switch_port in switch_ports:
         try:
@@ -522,7 +538,31 @@ def main():
     file_rename()
     archive_limit()
 
-    return "IT WORKS!"
+    #return render_template('step3.html')
+
+from flask import Flask, stream_with_context, request, Response, flash
+from time import sleep
+
+
+def stream_template(template_name, **context):
+    app.update_template_context(context)
+    t = app.jinja_env.get_template(template_name)
+    rv = t.stream(context)
+    rv.disable_buffering()
+    return rv
+
+def generate():
+    main()
+    for progress in range(1):
+        yield (progress_percent)
+        sleep(1)
+
+#from flask import flash
+
+@app.route('/stream')
+def stream_view():
+    rows = generate()
+    return Response(stream_template('step3.html', rows=rows))
 
 
 if __name__ == "__main__":
