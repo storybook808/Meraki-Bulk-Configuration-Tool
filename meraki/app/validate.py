@@ -122,5 +122,5 @@ def validate_form():
         flash('Validation Complete')
 
     # return same template page to display messages
-    return redirect(url_for('step2'))
+    return redirect(url_for('step2a'))
 
