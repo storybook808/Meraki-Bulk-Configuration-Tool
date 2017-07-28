@@ -111,7 +111,7 @@ def validate_form():
         # for checking that Allowed VLANs can be all or comma seperated numbers
         # grab value for allowed VLANS
         allowed_vlan = worksheet.cell(row, 12)
-        if allowed_vlan.ctype == 0 or allowed_vlan.ctype == 1 and allowed_vlan.value == 'all' or allowed_vlan.ctype == 2 or allowed_vlan.value == '':
+        if allowed_vlan.ctype == 0 or allowed_vlan.ctype == 1 or allowed_vlan.value == 'all' or allowed_vlan.ctype == 2 or allowed_vlan.value == '':
             pass
         else:
             flash("ERROR! Allowed VLANs must be 'all' or numbers")
