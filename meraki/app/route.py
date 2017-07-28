@@ -58,11 +58,11 @@ def upload_file():
         return redirect(url_for('step2'))
 
 
+
 # Route to step1 page
 # Formats the step1.html page
-
-
 @app.route('/')
+
 @app.route('/step1.html')
 def step1():
     return render_template('step1.html')

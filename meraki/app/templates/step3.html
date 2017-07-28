@@ -55,20 +55,16 @@
             <h2>
                 Processing Data... Please Wait
             </h2>
+
+
             <div class="ui active centered inline loader">Loading</div>
             {% for item in rows %}
             <h1>{{ item }}</h1>
             {% endfor %}
+
+
+
         </div>
     </div>
-    <center>
-        <div id="pythonVariable" style="hidden bottom: 0px; left: 0px;">
-            <iframe width=1000 height=100 frameborder="0px">
-            </iframe>
-        </div>
-        <form action="http://localhost:5000/main" method="POST">
-            <button class="ui positive center floated button">Run</button>
-        </form>
-    </center>
 </body>
 </html>

@@ -1,6 +1,9 @@
 from flask import Blueprint
 import merakiapi
 import os, shutil
+from flask import Flask, stream_with_context, request, Response, flash
+from time import sleep
+from app import app
 
 configure_blueprint = Blueprint('configure', __name__, template_folder='templates')
 
@@ -9,6 +12,7 @@ configure_blueprint = Blueprint('configure', __name__, template_folder='template
 @configure_blueprint.route('/configure', methods=['POST'])
 def configure():
 
+    global progress_percent
 
     class Device:
         def __init__(self, row):
@@ -334,7 +338,28 @@ def configure():
     file_rename()
     archive_limit()
 
-    return "IT WORKS!"
+    #return "IT WORKS!"
+
+
+def stream_template(template_name, **context):
+    app.update_template_context(context)
+    t = app.jinja_env.get_template(template_name)
+    rv = t.stream(context)
+    rv.disable_buffering()
+    return rv
+
+
+def generate():
+    configure()
+    for progress in range(1):
+        yield (progress_percent)
+        sleep(1)
+
+
+@configure_blueprint.route('/stream')
+def stream_view():
+    rows = generate()
+    return Response(stream_template('step3.html', rows=rows))
 
 
 if __name__ == "__main__":
