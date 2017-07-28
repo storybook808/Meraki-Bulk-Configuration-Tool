@@ -74,6 +74,12 @@ def step1():
 def step2():
     return render_template('step2.html')
 
+# Route to step2 page
+# Formats the step2.html page
+@app.route('/step2a.html')
+def step2a():
+    return render_template('step2a.html')
+
 
 # Route to step3 page
 # Formats the step1.html page

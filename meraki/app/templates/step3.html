@@ -56,10 +56,12 @@
                 Processing Data... Please Wait
             </h2>
 
+            <div class="ui enabled centered inline loader">Loading</div>
 
-            <div class="ui active centered inline loader">Loading</div>
+            </div>
             {% for item in rows %}
-            <h1>{{ item }}</h1>
+            <h1><center>{{ item }}</center></h1>
+            <h2><center>All switches have been configured</center></h2>
             {% endfor %}
 
 

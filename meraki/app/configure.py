@@ -13,6 +13,7 @@ configure_blueprint = Blueprint('configure', __name__, template_folder='template
 def configure():
 
     global progress_percent
+    global org_name
 
     class Device:
         def __init__(self, row):
@@ -347,7 +348,6 @@ def stream_template(template_name, **context):
     rv = t.stream(context)
     rv.disable_buffering()
     return rv
-
 
 def generate():
     configure()
