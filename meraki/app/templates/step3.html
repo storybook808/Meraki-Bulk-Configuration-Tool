@@ -56,7 +56,26 @@
                 Processing Data... Please Wait
             </h2>
 
-            <div class="ui enabled centered inline loader">Loading</div>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.css">
+            <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+            <script type="text/javascript"
+                src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.js"></script>
+            <script>
+
+            var source = new EventSource("/progress");
+            source.onmessage = function(event) {
+                $('#progress-bar').progress({
+                percent: event.data
+            }).attr('aria-valuenow', event.data);
+            }
+            </script>
+
+            <div class="ui indicating progress" id="progress-bar" style="width:50%;margin:auto">
+            <div class="bar">
+            <div class="progress"></div>
+            </div>
+            <div class="label">Processing...</div>
+            gi</div>
 
             </div>
             {% for item in rows %}

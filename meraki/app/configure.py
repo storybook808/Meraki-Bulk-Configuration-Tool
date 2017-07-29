@@ -1,9 +1,9 @@
 from flask import Blueprint
-import merakiapi
+import merakiapi,time
 import os, shutil
-from flask import Flask, stream_with_context, request, Response, flash
-from time import sleep
+from flask import Flask, stream_with_context, request, Response, flash, send_file
 from app import app
+
 
 configure_blueprint = Blueprint('configure', __name__, template_folder='templates')
 
@@ -13,7 +13,7 @@ configure_blueprint = Blueprint('configure', __name__, template_folder='template
 def configure():
 
     global progress_percent
-    global org_name
+    #global org_name
 
     class Device:
         def __init__(self, row):
@@ -155,7 +155,7 @@ def configure():
                 counter += 1
                 if counter == 19:
                     break
-
+    ### Code to configure the base configuration for switches
     # def main():
     #     # Pull the configurations.
     #     configurations = {}
@@ -264,30 +264,20 @@ def configure():
     # API key.
     api_key = "8b43aaa7b92b6d3ad06234e6f581077620d3e512"
 
-    # Get the organization name.
-    print("Organization Name:")
-    org_name = input()
 
-    # Pull the organizations associated to the provided API key.
+    ### Pull the organizations associated to the provided API key.
     orgs = merakiapi.myorgaccess(api_key, True)
-
-    # Look for the organization that we want to configure.
-    org_id = ""
-    for org in orgs:
-        if org_name in org["name"]:
-            org_id = org["id"]
-
-    if org_id == "":
-        print("Organization not found.")
+    print(orgs)
 
     ### Pull the networks associated with the organization. ###
-    networks = merakiapi.getnetworklist(api_key, org_id, True)
+    networks = []
+    for org in orgs:
+        networks += merakiapi.getnetworklist(api_key, org["id"], True)
 
     ### Pull the devices from all of the networks. ###
     devices = []
     for network in networks:
         devices += merakiapi.getnetworkdevices(api_key, network["id"], True)
-    # print devices
 
     switch_ports = []
     for device in devices:
@@ -317,7 +307,10 @@ def configure():
         switch_port["rstpEnabled"] = configurations[switch_port["serial"], str(switch_port["number"])].rstp
         switch_port["stpGuard"] = configurations[switch_port["serial"], str(switch_port["number"])].stp_guard
         switch_port["poeEnabled"] = configurations[switch_port["serial"], str(switch_port["number"])].poe
-        switch_port["type"] = configurations[switch_port["serial"], str(switch_port["number"])].type
+        try:
+            switch_port["type"] = configurations[switch_port["serial"], str(switch_port["number"])].type
+        except AttributeError:
+            pass
         switch_port["vlan"] = configurations[switch_port["serial"], str(switch_port["number"])].vlan
         switch_port["voiceVlan"] = configurations[switch_port["serial"], str(switch_port["number"])].voice_vlan
         switch_port["allowedVlans"] = configurations[switch_port["serial"], str(switch_port["number"])].allowed_vlan
@@ -349,17 +342,39 @@ def stream_template(template_name, **context):
     rv.disable_buffering()
     return rv
 
-def generate():
+import time
+
+'''def generate():
     configure()
-    for progress in range(1):
-        yield (progress_percent)
-        sleep(1)
+    x = 0
+    while x < 100:
+
+        print(x)
+        x = x + 10
+        time.sleep(0.2)
+        yield "data:" + str(x) + "\n\n"
 
 
 @configure_blueprint.route('/stream')
 def stream_view():
     rows = generate()
-    return Response(stream_template('step3.html', rows=rows))
+    return Response(stream_template('step3.html', rows=rows))'''
+
+@configure_blueprint.route('/index')
+def index():
+    return send_file('templates/step3.html')
+
+@configure_blueprint.route('/progress')
+def progress():
+    def generate():
+        configure()
+        x = 0
+        while x < 100:
+            print(x)
+            x = x + 10
+            time.sleep(0.2)
+            yield "data:" + str(x) + "\n\n"
+    return Response(generate(), mimetype= 'text/event-stream')
 
 
 if __name__ == "__main__":

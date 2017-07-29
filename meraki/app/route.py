@@ -6,13 +6,16 @@ from werkzeug import secure_filename
 import os, shutil
 app.secret_key = 'some_secret'
 
+from flask import Response
+import time
+from app import app
 
 # route to file uploader
 
-@app.route('/progress')
+''''@app.route('/progress')
 def progress():
     global progress_percent
-    return progress_percent
+    return progress_percent'''
 
 
 @app.route('/uploader', methods=['GET', 'POST'])
@@ -59,14 +62,27 @@ def upload_file():
 
 
 
-# Route to step1 page
-# Formats the step1.html page
+
 @app.route('/')
 
+
+# Route to step1 page
+# Formats the step1.html page
 @app.route('/step1.html')
 def step1():
     return render_template('step1.html')
 
+''''@app.route('/progress')
+def progress():
+    def generate():
+        configure()
+        x = 0
+        while x < 100:
+            print(x)
+            x = x + 10
+            time.sleep(0.2)
+            yield "data:" + str(x) + "\n\n"
+    return Response(generate(), mimetype= 'text/event-stream')'''
 
 # Route to step2 page
 # Formats the step2.html page

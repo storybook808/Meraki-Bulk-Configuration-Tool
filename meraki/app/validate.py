@@ -75,7 +75,7 @@ def validate_form():
         # for checking that Type is either access or trunk
         # grab value for type
         type = worksheet.cell(row, 9)
-        if type.value == "trunk" or type.value == "access" or type.value == '':
+        if type.value.lower() == "trunk" or type.value.lower() == "access" or type.value.lower() == '':
             pass
         else:
             flash("ERROR! Type must be either access or trunk")
