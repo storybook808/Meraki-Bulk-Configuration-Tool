@@ -4,16 +4,17 @@ import os, shutil
 from flask import Flask, stream_with_context, request, Response, flash
 from time import sleep
 from app import app
+import xlrd
 
 configure_blueprint = Blueprint('configure', __name__, template_folder='templates')
 
-
+global progress_percent
+global org_name
 # This function configures the meraki page
 @configure_blueprint.route('/configure', methods=['POST'])
 def configure():
 
-    global progress_percent
-    global org_name
+
 
     class Device:
         def __init__(self, row):
@@ -56,6 +57,17 @@ def configure():
             self.vlan = row[10]
             self.voice_vlan = row[11]
             self.allowed_vlan = row[12]
+
+
+    def get_api_key(api_path):
+        workbook = xlrd.open_workbook(api_path)
+        ws = workbook.sheet_by_index(0)
+        cell = ws.cell_value(1, 0)
+        print(cell)
+        print(type(cell))
+        return cell
+
+
 
     # Time Function
     # Purpose: Calculate the time to append to file name to better
@@ -262,7 +274,7 @@ def configure():
     # print(configurations)
 
     # API key.
-    api_key = "8b43aaa7b92b6d3ad06234e6f581077620d3e512"
+    api_key = get_api_key(temp_path)
 
     # Get the organization name.
     print("Organization Name:")
@@ -270,6 +282,7 @@ def configure():
 
     # Pull the organizations associated to the provided API key.
     orgs = merakiapi.myorgaccess(api_key, True)
+    print(orgs)
 
     # Look for the organization that we want to configure.
     org_id = ""
@@ -352,8 +365,8 @@ def stream_template(template_name, **context):
 def generate():
     configure()
     for progress in range(1):
-        yield (progress_percent)
-        sleep(1)
+       yield (progress_percent)
+       sleep(1)
 
 
 @configure_blueprint.route('/stream')

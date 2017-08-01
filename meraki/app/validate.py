@@ -19,7 +19,7 @@ def validate_form():
     print(path + current_file[0])
     # open up working excel file to validate.
     workbook = xlrd.open_workbook(path + '/' + current_file[0])
-    worksheet = workbook.sheet_by_index(0)
+    worksheet = workbook.sheet_by_index(1)
 
     flag = 0
 
