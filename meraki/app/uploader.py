@@ -1,16 +1,12 @@
 from app import app
-
-from flask import render_template, session, redirect, url_for, flash, request
-import os
+from flask import redirect, url_for, flash, request, Blueprint
 from werkzeug import secure_filename
-import os, shutil
-app.secret_key = 'some_secret'
 
 
-# route to file uploader
+uploader_blueprint = Blueprint('uploader', __name__, template_folder='templates')
 
 
-@app.route('/uploader', methods=['GET', 'POST'])
+@uploader_blueprint.route('/uploader', methods=['GET', 'POST'])
 def upload_file():
     import os
 
@@ -41,45 +37,6 @@ def upload_file():
         print(current_file)
 
         # if there is more than a single file in the temp folder remove the extra files
-
-        if len(current_file) > 1:
-            # remove all files except the first
-            os.remove(os.path.join(path, current_file[1]))
-            print("file removed")
-
-        flash('File has been uploaded')
-
+        flash('file has been uploaded')
 
         return redirect(url_for('step2'))
-
-
-
-# Route to step1 page
-# Formats the step1.html page
-@app.route('/')
-
-@app.route('/step1.html')
-def step1():
-    return render_template('step1.html')
-
-
-# Route to step2 page
-# Formats the step2.html page
-@app.route('/step2.html')
-def step2():
-    return render_template('step2.html')
-
-# Route to step2 page
-# Formats the step2.html page
-@app.route('/step2a.html')
-def step2a():
-    return render_template('step2a.html')
-
-
-# Route to step3 page
-# Formats the step1.html page
-@app.route('/step3.html')
-def step3():
-    return render_template('step3.html')
-
-
