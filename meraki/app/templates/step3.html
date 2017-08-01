@@ -6,6 +6,16 @@
     <script type="text/javascript"
             src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.js"></script>
 
+    <script>
+    var source = new EventSource("/progress");
+    source.onmessage = function(event) {
+        $('#progress-bar').progress({
+            percent: event.data
+        }).attr('aria-valuenow', event.data);
+    }
+
+    </script>
+
     <!--header image-->
     <div class="ui small images">
         <img class="ui image"
@@ -50,25 +60,12 @@
                 </div>
             </div>
         </div>
-        <div class="ui centered container"
-             style="text-align: center; vertical-align: middle; line-height: 90px; padding-top: 100px">
-            <h2>
-                Progress Bar
-            </h2>
-            <div class="ui indicating progress">
-                <div class="bar"></div>
-                <div class="label">Excecuting</div>
+        <div class="ui indicating progress" id="progress-bar" style="width:50%;margin:auto">
+            <div class="bar">
+                <div class="progress"></div>
             </div>
+            <div class="label">Processing...</div>
         </div>
     </div>
-    <center>
-        <div id="pythonVariable" style="hidden bottom: 0px; left: 0px;">
-            <iframe width=1000 height=100 frameborder="0px">
-            </iframe>
-        </div>
-        <form action="http://localhost:5000/main" method="POST">
-            <button class="ui positive center floated button">Run</button>
-        </form>
-    </center>
 </body>
 </html>
