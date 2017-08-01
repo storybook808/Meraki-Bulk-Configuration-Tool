@@ -3,14 +3,17 @@ import merakiapi,time
 import os, shutil
 from flask import Flask, stream_with_context, request, Response, flash, send_file
 from app import app
+import xlrd
 
 
 configure_blueprint = Blueprint('configure', __name__, template_folder='templates')
 
-
+global progress_percent
+global org_name
 # This function configures the meraki page
 @configure_blueprint.route('/configure', methods=['POST'])
 def configure():
+
 
     global progress_percent
     #global org_name
@@ -56,6 +59,17 @@ def configure():
             self.vlan = row[10]
             self.voice_vlan = row[11]
             self.allowed_vlan = row[12]
+
+
+    def get_api_key(api_path):
+        workbook = xlrd.open_workbook(api_path)
+        ws = workbook.sheet_by_index(0)
+        cell = ws.cell_value(1, 0)
+        print(cell)
+        print(type(cell))
+        return cell
+
+
 
     # Time Function
     # Purpose: Calculate the time to append to file name to better
@@ -262,7 +276,7 @@ def configure():
     # print(configurations)
 
     # API key.
-    api_key = "8b43aaa7b92b6d3ad06234e6f581077620d3e512"
+    api_key = get_api_key(temp_path)
 
 
     ### Pull the organizations associated to the provided API key.
@@ -346,6 +360,7 @@ import time
 
 '''def generate():
     configure()
+
     x = 0
     while x < 100:
 
@@ -353,6 +368,7 @@ import time
         x = x + 10
         time.sleep(0.2)
         yield "data:" + str(x) + "\n\n"
+
 
 
 @configure_blueprint.route('/stream')
