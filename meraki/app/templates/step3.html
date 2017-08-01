@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.js"></script>
+
+    <script>
+    var source = new EventSource("/progress");
+    source.onmessage = function(event) {
+        $('#progress-bar').progress({
+            percent: event.data
+        }).attr('aria-valuenow', event.data);
+    }
+
+    </script>
+    <!--header image-->
+    <div class="ui small images">
+        <img class="ui image" style="width: 25%; display: block; margin-left: auto; margin-right: auto"
+             src="https://www2.wwt.com/wp-content/uploads/2015/03/press-kit-28.png">
+
+    </div>
+
+</head>
+<body>
+<div class="ui fluid container" id="step3">
+    <div class="step 3">
+        <div class="ui fluid ordered steps">
+            <div class="completed step">
+                <div class="content">
+                    <div class="title"><a href="step1.html">Step 1</a></div>
+                    <div class="description">Download Template</div>
+                </div>
+            </div>
+            <div class="completed step">
+                <div class="content">
+                    <div class="title"><a href="step2.html">Step 2</a></div>
+                    <div class="description">Load Configuration</div>
+                </div>
+            </div>
+            <div class="active step">
+                <div class="content">
+                    <div class="title">Step 3</div>
+                    <div class="description">Run</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ui indicating progress" id="progress-bar" style="width:50%;margin:auto">
+            <div class="bar">
+                <div class="progress"></div>
+            </div>
+            <div class="label">Processing...</div>
+
+        </div>
+
+
+    </div>
+</body>
+</html>
