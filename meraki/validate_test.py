@@ -68,7 +68,7 @@ for row in range(1, worksheet.nrows):
     if stp_guard.value.lower() == "disabled" or stp_guard.value.lower() == 'root guard' or stp_guard.value.lower() == 'bpdu guard' or stp_guard.value.lower() == '':
         pass
     else:
-        print("""ERROR! STP Guard must be 'disabled' 'Root guard' or 'BPDU guard'""")
+        print("""ERROR! STP Guard must be 'disabled' 'Root guard' or 'BPDU guard' Check cell:""", worksheet.cell(row,7))
         flag += 1
 
     #for checking that Type is either access or trunk
@@ -111,7 +111,7 @@ for row in range(1, worksheet.nrows):
 
     #for checking that Allowed VLANs can be all or comma seperated numbers
     # grab value for allowed VLANS
-    allowed_vlans = worksheet.cell(row, 12) 
+    allowed_vlans = worksheet.cell(row, 12)
     if allowed_vlans.ctype == 0 or allowed_vlans.ctype == 1 or allowed_vlans.value == 'all' or allowed_vlans.ctype == 2 or allowed_vlans.value == '':
         pass
     else:

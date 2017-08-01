@@ -7,8 +7,8 @@
             src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.js"></script>
     <!--header image-->
     <div class="ui small images">
-
-           <img class="ui image" style = "width: 25%; display: block; margin-left: auto; margin-right: auto" src="https://www2.wwt.com/wp-content/uploads/2015/03/press-kit-28.png">
+        <img class="ui image" style="width: 25%; display: block; margin-left: auto; margin-right: auto"
+             src="https://www2.wwt.com/wp-content/uploads/2015/03/press-kit-28.png">
     </div>
 
 </head>
@@ -59,36 +59,29 @@ line-height: 90px; padding-top: 100px">
             </h2>
             <h4> Choose an excel workbook to configure the switch </h4>
 
+            <form action="http://localhost:5000/uploader" method="POST"
+                  enctype="multipart/form-data">
+                <input type="file" name="file"/>
+                <button class="ui positive button">Upload</button>
+            </form>
 
-                <form action="http://localhost:5000/uploader" method="POST"
-                      enctype="multipart/form-data">
-                    <input type="file" name="file"/>
-                    <button class="ui positive button">Upload</button>
-                </form>
-
-
-                <button id = "myBtn" disabled class="ui positive right floated button" >
-                    <div class="title"><a href="/stream">Run</a></div>
-                </button>
-
-            <div class=" ui containter">
-                <a href="step3.html">
-                    <button class="ui right floated blue button" style="margin-right: 100px; margin-bottom: 50px;">
-                        Next
-                    </button>
-                </a>
-            </div>
+            <button class="ui positive right floated button" >
+                <div class="title"><a href="/index">Run</a></div>
+            </button>
 
 
-                <button onclick = "myFunction()" class="ui positive right floated button">
-                    <div class="title"><a href="/validate/">Validate</a></div>
-                </button>
+            <button class="ui positive right floated button">
+                <div class="title"><a href="/validate/">Validate</a></div>
+            </button>
 
 
-            </h4>
-        </div>
+</body>
+</html>
 
-    </div>
+
+</h4>
+</div>
+</div>
 </div>
 </body>
 </html>
