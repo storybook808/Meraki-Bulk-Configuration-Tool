@@ -19,6 +19,7 @@ def validate_form():
     print(path + current_file[0])
     # open up working excel file to validate.
     workbook = xlrd.open_workbook(path + '/' + current_file[0])
+
     worksheet = workbook.sheet_by_index(1)
 
     flag = 0
@@ -31,15 +32,19 @@ def validate_form():
         rstp = worksheet.cell_value(row, 6)
         # grab value for PoE
         poe = worksheet.cell_value(row, 8)
+        
         if enable == 1 or enable == 0 or enable == '':
             pass
         else:
             flash('ERROR! Enabled must be either True or False. Check cell: F', row)
+
             flag += 1
         if rstp == 1 or rstp == 0 or rstp == '':
             pass
         else:
+
             flash('ERROR! RSTP must be either True or False. Check cell: G', row)
+
             flag += 1
         if poe == 1 or poe == 0 or poe == '':
             pass
@@ -53,12 +58,14 @@ def validate_form():
         if stp_guard.value.lower() == "disabled" or stp_guard.value.lower() == 'root guard' or stp_guard.value.lower() == 'bpdu guard' or stp_guard.value.lower() == '':
             pass
         else:
+
             flash("""ERROR! STP Guard must be 'disabled' 'Root guard' or 'BPDU guard'. Check cell: H""", row)
             flag += 1
 
         # for checking that Type is either access or trunk
         # grab value for type
         type = worksheet.cell(row, 9)
+
         if type.value.lower() == "trunk" or type.value.lower() == "access" or type.value.lower() == '':
             pass
         else:
@@ -71,6 +78,7 @@ def validate_form():
         if vlan.ctype == 0 or vlan.ctype == 2:
             pass
         else:
+
             flash("ERROR! VLAN must be a number. Check cell: K", row)
             flag += 1
 
@@ -80,6 +88,7 @@ def validate_form():
         if voice_vlan.ctype == 0 or voice_vlan.ctype == 2:
             pass
         else:
+
             flash("ERROR! Voice VLAN must be a number. Check cell: L", row)
             flag += 1
 
@@ -89,7 +98,9 @@ def validate_form():
         if port_number.ctype == 0 or port_number.ctype == 2:
             pass
         else:
+
             flash("ERROR! Port # must be a number. Check cell: C", row)
+
             flag += 1
 
         # for checking that Allowed VLANs can be all or comma seperated numbers
@@ -98,7 +109,9 @@ def validate_form():
         if allowed_vlan.ctype == 0 or allowed_vlan.ctype == 1 or allowed_vlan.value == 'all' or allowed_vlan.ctype == 2 or allowed_vlan.value == '':
             pass
         else:
+
             flash("ERROR! Allowed VLANs must be 'all' or numbers. Check cell: M", row)
+
             flag += 1
 
     # if no error messages then display validation complete

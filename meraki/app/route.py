@@ -12,11 +12,6 @@ from app import app
 
 # route to file uploader
 
-''''@app.route('/progress')
-def progress():
-    global progress_percent
-    return progress_percent'''
-
 
 @app.route('/uploader', methods=['GET', 'POST'])
 def upload_file():
@@ -62,12 +57,8 @@ def upload_file():
 
 
 
-
 @app.route('/')
 
-
-# Route to step1 page
-# Formats the step1.html page
 @app.route('/step1.html')
 def step1():
     return render_template('step1.html')

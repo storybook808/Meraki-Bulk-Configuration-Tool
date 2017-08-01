@@ -1,22 +1,28 @@
 from flask import Blueprint
-import merakiapi,time
+import merakiapi,time 
 import os, shutil
 from flask import Flask, stream_with_context, request, Response, flash, send_file
+from time import sleep
 from app import app
 import xlrd
 
-
 configure_blueprint = Blueprint('configure', __name__, template_folder='templates')
 
-global progress_percent
-global org_name
+@app.route('/step3')
+def progress_bar():
+    global progress_bar
+    return send_file('templates/step3.html')
+
+
 # This function configures the meraki page
-@configure_blueprint.route('/configure', methods=['POST'])
+@configure_blueprint.route('/progress')
 def configure():
 
-
     global progress_percent
-    #global org_name
+    global org_name
+
+
+# This function configures the meraki page
 
     class Device:
         def __init__(self, row):
@@ -68,6 +74,7 @@ def configure():
         print(cell)
         print(type(cell))
         return cell
+
 
 
 
@@ -169,6 +176,7 @@ def configure():
                 counter += 1
                 if counter == 19:
                     break
+
     ### Code to configure the base configuration for switches
     # def main():
     #     # Pull the configurations.
@@ -250,7 +258,7 @@ def configure():
             th_count -= 1
 
     progress_total = valid_row - 1  # save total number of excel entries to track for progress while compiling
-    progress_count = 0  # initialize variable for progress count
+
 
     # create dictionary for switch port
     my_row = []
@@ -276,6 +284,8 @@ def configure():
     # print(configurations)
 
     # API key.
+
+
     api_key = get_api_key(temp_path)
 
 
@@ -311,35 +321,43 @@ def configure():
     print(switch_ports)
 
     ### Apply configuration to the devices and push them to Meraki. ###
-    for switch_port in switch_ports:
-        try:
-            switch_port["name"] = configurations[switch_port["serial"], str(switch_port["number"])].name
-        except:
-            continue
-        switch_port["tags"] = configurations[switch_port["serial"], str(switch_port["number"])].tags
-        switch_port["enabled"] = configurations[switch_port["serial"], str(switch_port["number"])].enabled
-        switch_port["rstpEnabled"] = configurations[switch_port["serial"], str(switch_port["number"])].rstp
-        switch_port["stpGuard"] = configurations[switch_port["serial"], str(switch_port["number"])].stp_guard
-        switch_port["poeEnabled"] = configurations[switch_port["serial"], str(switch_port["number"])].poe
-        try:
+
+    ### Yield progress bar status to site ###
+    def generate():
+        progress_count = 0
+        for switch_port in switch_ports:
+            try:
+                switch_port["name"] = configurations[switch_port["serial"], str(switch_port["number"])].name
+            except:
+                continue
+            switch_port["tags"] = configurations[switch_port["serial"], str(switch_port["number"])].tags
+            switch_port["enabled"] = configurations[switch_port["serial"], str(switch_port["number"])].enabled
+            switch_port["rstpEnabled"] = configurations[switch_port["serial"], str(switch_port["number"])].rstp
+            switch_port["stpGuard"] = configurations[switch_port["serial"], str(switch_port["number"])].stp_guard
+            switch_port["poeEnabled"] = configurations[switch_port["serial"], str(switch_port["number"])].poe
             switch_port["type"] = configurations[switch_port["serial"], str(switch_port["number"])].type
-        except AttributeError:
-            pass
-        switch_port["vlan"] = configurations[switch_port["serial"], str(switch_port["number"])].vlan
-        switch_port["voiceVlan"] = configurations[switch_port["serial"], str(switch_port["number"])].voice_vlan
-        switch_port["allowedVlans"] = configurations[switch_port["serial"], str(switch_port["number"])].allowed_vlan
+            switch_port["vlan"] = configurations[switch_port["serial"], str(switch_port["number"])].vlan
+            switch_port["voiceVlan"] = configurations[switch_port["serial"], str(switch_port["number"])].voice_vlan
+            switch_port["allowedVlans"] = configurations[switch_port["serial"], str(switch_port["number"])].allowed_vlan
 
-        # print (switch_port["enabled"])
+            # print (switch_port["enabled"])
 
 
-        merakiapi.updateswitchport(api_key, switch_port["serial"], switch_port["number"], switch_port["name"],
-                                   switch_port["tags"], switch_port["enabled"], switch_port["type"],
-                                   switch_port["vlan"], switch_port["voiceVlan"], switch_port["allowedVlans"],
-                                   switch_port["poeEnabled"], "", switch_port["rstpEnabled"], switch_port["stpGuard"],
-                                   "")
-        progress_count += 1
-        progress_percent = '{:.1%}'.format(progress_count / progress_total)
-        print(progress_percent)
+            merakiapi.updateswitchport(api_key, switch_port["serial"], switch_port["number"], switch_port["name"],
+                                       switch_port["tags"], switch_port["enabled"], switch_port["type"],
+                                       switch_port["vlan"], switch_port["voiceVlan"], switch_port["allowedVlans"],
+                                       switch_port["poeEnabled"], "", switch_port["rstpEnabled"], switch_port["stpGuard"],
+                                       "")
+
+            # progress_percent = '{:.1%}'.format(progress_count / progress_total)
+            progress_count += 1
+            print(progress_count)
+            progress_percent = progress_count / progress_total * 100
+            # print(progress_percent)
+            yield "data:" + str(progress_percent) + "\n\n"
+    return Response(generate(), mimetype ='text/event-stream')
+
+
 
     archive_path = os.path.abspath(os.path.join('app', 'archive'))
     shutil.copy(temp_path, archive_path)
@@ -356,41 +374,20 @@ def stream_template(template_name, **context):
     rv.disable_buffering()
     return rv
 
-import time
 
-'''def generate():
+def generate():
     configure()
-
-    x = 0
-    while x < 100:
-
-        print(x)
-        x = x + 10
-        time.sleep(0.2)
-        yield "data:" + str(x) + "\n\n"
+    for progress in range(1):
+        yield (progress_percent)
+        sleep(1)
 
 
 
 @configure_blueprint.route('/stream')
 def stream_view():
     rows = generate()
-    return Response(stream_template('step3.html', rows=rows))'''
+    return Response(stream_template('step3.html', rows=rows))
 
-@configure_blueprint.route('/index')
-def index():
-    return send_file('templates/step3.html')
-
-@configure_blueprint.route('/progress')
-def progress():
-    def generate():
-        configure()
-        x = 0
-        while x < 100:
-            print(x)
-            x = x + 10
-            time.sleep(0.2)
-            yield "data:" + str(x) + "\n\n"
-    return Response(generate(), mimetype= 'text/event-stream')
 
 
 if __name__ == "__main__":
