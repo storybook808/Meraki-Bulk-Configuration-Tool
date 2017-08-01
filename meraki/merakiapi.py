@@ -2281,7 +2281,7 @@ def updateswitchport(apikey, serialnum, portnum, name, tags, enabled, porttype, 
 
     putdata['enabled'] = str(enabled)
 
-    if porttype and porttype not in ['access', 'trunk']:
+    if porttype and porttype not in ['access', 'trunk', 'TRUNK', 'ACCESS']:
         raise ValueError("Type must be either 'access' or 'trunk'")
     elif porttype:
         putdata['type'] = str(porttype)
