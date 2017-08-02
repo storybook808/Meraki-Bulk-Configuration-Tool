@@ -68,7 +68,6 @@ def configure():
             self.voice_vlan = row[11]
             self.allowed_vlan = row[12]
 
-
     def get_api_key(api_path):
         workbook = xlrd.open_workbook(api_path)
         ws = workbook.sheet_by_index(0)
@@ -280,14 +279,20 @@ def configure():
 
     ### Pull the organizations associated to the provided API key.
     orgs = merakiapi.myorgaccess(api_key, True)
-    print(orgs)
 
-    '''for org in orgs:
+
+    #if orgs is None :
+    #    flash('ERROR! Cannot find organization. Check API key')
+    #    return render_template('step2.html')
+
+    org_name = 'World Wide'
+
+    for org in orgs:
         if org_name in org["name"]:
             org_id = org["id"]
 
     if org_id == "":
-        print("Orginization not Found")'''
+        print("Orginization not Found")
 
     ### Pull the networks associated with the organization. ###
     networks = []
@@ -314,7 +319,11 @@ def configure():
         # Append the switch ports for the current switch to the master list.
         switch_ports += current_switch_ports
 
+    archive_path = os.path.abspath(os.path.join('app', 'archive'))
     print(switch_ports)
+    shutil.copy(temp_path, archive_path)
+    file_rename()
+    archive_limit()
 
     ### Apply configuration to the devices and push them to Meraki. ###
     ### Yield progress bar status to site ###
@@ -358,13 +367,12 @@ def configure():
     return Response(generate(), mimetype ='text/event-stream')
 
 
-
-
    # archive_path = os.path.abspath(os.path.join('app', 'archive'))
 
     shutil.copy(temp_path, archive_path)
     file_rename()
     archive_limit()
+
 
     #return "IT WORKS!"
 
