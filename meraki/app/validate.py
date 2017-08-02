@@ -19,7 +19,7 @@ def validate_form():
     print(path + current_file[0])
     # open up working excel file to validate.
     workbook = xlrd.open_workbook(path + '/' + current_file[0])
-    worksheet = workbook.sheet_by_index(0)
+    worksheet = workbook.sheet_by_index(2)
 
     flag = 0
 
@@ -39,6 +39,7 @@ def validate_form():
         if rstp == 1 or rstp == 0 or rstp == '':
             pass
         else:
+
             flash('ERROR! RSTP must be either True or False. Check cell: G', row)
             flag += 1
         if poe == 1 or poe == 0 or poe == '':
@@ -62,6 +63,7 @@ def validate_form():
         if type.value.lower() == "trunk" or type.value.lower() == "access" or type.value.lower() == '':
             pass
         else:
+
             flash("ERROR! Type must be either access or trunk. Check cell: J", row)
             flag += 1
 

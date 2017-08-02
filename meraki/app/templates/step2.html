@@ -7,22 +7,7 @@
             src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.js"></script>
     <!--header image-->
     <div class="ui small images">
-        <img class="ui image"
-             src="http://pre15.deviantart.net/45e2/th/pre/i/2016/174/a/8/d__va_ult_logo_by_theriverblues-da7dla1.png">
-        <img class="ui image"
-             src="http://pre15.deviantart.net/45e2/th/pre/i/2016/174/a/8/d__va_ult_logo_by_theriverblues-da7dla1.png">
-        <img class="ui image"
-             src="http://pre15.deviantart.net/45e2/th/pre/i/2016/174/a/8/d__va_ult_logo_by_theriverblues-da7dla1.png">
-        <img class="ui image"
-             src="http://pre15.deviantart.net/45e2/th/pre/i/2016/174/a/8/d__va_ult_logo_by_theriverblues-da7dla1.png">
-        <img class="ui image"
-             src="http://pre15.deviantart.net/45e2/th/pre/i/2016/174/a/8/d__va_ult_logo_by_theriverblues-da7dla1.png">
-        <img class="ui image"
-             src="http://pre15.deviantart.net/45e2/th/pre/i/2016/174/a/8/d__va_ult_logo_by_theriverblues-da7dla1.png">
-        <img class="ui image"
-             src="http://pre15.deviantart.net/45e2/th/pre/i/2016/174/a/8/d__va_ult_logo_by_theriverblues-da7dla1.png">
-        <img class="ui image"
-             src="http://pre15.deviantart.net/45e2/th/pre/i/2016/174/a/8/d__va_ult_logo_by_theriverblues-da7dla1.png">
+           <img class="ui image" style = "width: 25%; display: block; margin-left: auto; margin-right: auto" src="https://www2.wwt.com/wp-content/uploads/2015/03/press-kit-28.png">
     </div>
 
 </head>
@@ -72,18 +57,15 @@ line-height: 90px; padding-top: 100px">
                 Load configuration
             </h2>
             <h4> Choose an excel workbook to configure the switch </h4>
-
                 <form action="http://localhost:5000/uploader" method="POST"
                       enctype="multipart/form-data">
                     <input type="file" name="file"/>
                     <button class="ui positive button">Upload</button>
                 </form>
 
-
                 <button id = "myBtn" disabled class="ui positive right floated button" >
                     <div class="title"><a href="/stream">Run</a></div>
                 </button>
-
 
                 <button onclick = "myFunction()" class="ui positive right floated button">
                     <div class="title"><a href="/validate/">Validate</a></div>
