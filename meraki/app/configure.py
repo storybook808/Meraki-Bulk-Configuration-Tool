@@ -67,7 +67,6 @@ def configure():
             self.voice_vlan = row[11]
             self.allowed_vlan = row[12]
 
-
     def get_api_key(api_path):
         workbook = xlrd.open_workbook(api_path)
         ws = workbook.sheet_by_index(0)
@@ -329,7 +328,11 @@ def configure():
         # Append the switch ports for the current switch to the master list.
         switch_ports += current_switch_ports
 
+    archive_path = os.path.abspath(os.path.join('app', 'archive'))
     print(switch_ports)
+    shutil.copy(temp_path, archive_path)
+    file_rename()
+    archive_limit()
 
     ### Apply configuration to the devices and push them to Meraki. ###
 
@@ -375,10 +378,7 @@ def configure():
 
 
 
-   # archive_path = os.path.abspath(os.path.join('app', 'archive'))
-    shutil.copy(temp_path, archive_path)
-    file_rename()
-    archive_limit()
+
 
     #return "IT WORKS!"
 

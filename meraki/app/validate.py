@@ -19,9 +19,19 @@ def validate_form():
     print(path + current_file[0])
     # open up working excel file to validate.
     workbook = xlrd.open_workbook(path + '/' + current_file[0])
+    api_worksheet = workbook.sheet_by_index(0)
     worksheet = workbook.sheet_by_index(1)
 
     flag = 0
+
+    try:
+        if api_worksheet.cell_value(1, 0) != '':
+            pass
+    except IndexError:
+        flash('ERROR! No API key found. Check worksheet API key, cell A2')
+        flag += 1
+
+
 
     # for T/F values: Enabled, RSTP and PoE
     for row in range(1, worksheet.nrows):
