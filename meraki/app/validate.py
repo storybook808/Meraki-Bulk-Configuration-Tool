@@ -1,5 +1,6 @@
 from app import app
-from flask import redirect, url_for, flash, Blueprint
+from flask import redirect, url_for, flash, Blueprint, render_template
+from time import sleep
 import os
 
 
@@ -18,7 +19,12 @@ def validate_form():
     current_file = os.listdir(path)
     print(path + current_file[0])
     # open up working excel file to validate.
-    workbook = xlrd.open_workbook(path + '/' + current_file[0])
+    try:
+        workbook = xlrd.open_workbook(path + '/' + current_file[0])
+    except xlrd.biffh.XLRDError:
+        flash('ERROR! Incorrect File type, please re-upload a .xlsx file')
+        return render_template('step2.html')
+
     api_worksheet = workbook.sheet_by_index(0)
     worksheet = workbook.sheet_by_index(1)
 
@@ -30,6 +36,11 @@ def validate_form():
     except IndexError:
         flash('ERROR! No API key found. Check worksheet API key, cell A2')
         flag += 1
+
+
+
+
+
 
 
 
