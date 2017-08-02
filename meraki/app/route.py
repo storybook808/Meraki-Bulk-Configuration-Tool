@@ -1,3 +1,4 @@
+from app import app
 from flask import Response, render_template, session, redirect, url_for, flash, request
 import os
 from werkzeug import secure_filename

@@ -1,16 +1,4 @@
 from flask import Blueprint
-<<<<<<< HEAD
-import merakiapi
-import os, shutil
-
-configure_blueprint = Blueprint('configure', __name__, template_folder='templates')
-
-
-# This function configures the meraki page
-@configure_blueprint.route('/configure', methods=['POST'])
-def configure():
-
-=======
 import merakiapi ,time
 import os, shutil
 from flask import Flask, stream_with_context, request, Response, flash, send_file
@@ -35,7 +23,6 @@ def configure():
 
 
 # This function configures the meraki page
->>>>>>> e6ea6ea108f51d32ca7140c1cdfb68327b6cdae3
 
     class Device:
         def __init__(self, row):
@@ -79,8 +66,6 @@ def configure():
             self.voice_vlan = row[11]
             self.allowed_vlan = row[12]
 
-<<<<<<< HEAD
-=======
 
     def get_api_key(api_path):
         workbook = xlrd.open_workbook(api_path)
@@ -93,7 +78,6 @@ def configure():
 
 
 
->>>>>>> e6ea6ea108f51d32ca7140c1cdfb68327b6cdae3
     # Time Function
     # Purpose: Calculate the time to append to file name to better
     # debug Meraki configurations
@@ -193,10 +177,7 @@ def configure():
                 if counter == 19:
                     break
 
-<<<<<<< HEAD
-=======
     ### Code to configure the base configuration for switches
->>>>>>> e6ea6ea108f51d32ca7140c1cdfb68327b6cdae3
     # def main():
     #     # Pull the configurations.
     #     configurations = {}
@@ -255,14 +236,9 @@ def configure():
     configurations = {}
     from openpyxl import load_workbook
     wb = load_workbook(filename=temp_path)
-<<<<<<< HEAD
-    first_sheet = wb.get_sheet_names()[0]
-    ws = wb[first_sheet]
-=======
     port_config_sheet = wb.get_sheet_names()[1]
     print(port_config_sheet)
     ws = wb[port_config_sheet]
->>>>>>> e6ea6ea108f51d32ca7140c1cdfb68327b6cdae3
 
     ### valid row count ###
     valid_row = 0  # will be incremented to the number of valid rows
@@ -283,11 +259,7 @@ def configure():
             th_count -= 1
 
     progress_total = valid_row - 1  # save total number of excel entries to track for progress while compiling
-<<<<<<< HEAD
-    progress_count = 0  # initialize variable for progress count
-=======
 
->>>>>>> e6ea6ea108f51d32ca7140c1cdfb68327b6cdae3
 
     # create dictionary for switch port
     my_row = []
@@ -313,19 +285,6 @@ def configure():
     # print(configurations)
 
     # API key.
-<<<<<<< HEAD
-    api_key = "8b43aaa7b92b6d3ad06234e6f581077620d3e512"
-
-    # Get the organization name.
-    print("Organization Name:")
-    org_name = input()
-
-    # Pull the organizations associated to the provided API key.
-    orgs = merakiapi.myorgaccess(api_key, True)
-
-    # Look for the organization that we want to configure.
-    org_id = ""
-=======
 
 
     api_key = get_api_key(temp_path)
@@ -338,33 +297,21 @@ def configure():
 
     org_name = "World Wide"
 
->>>>>>> e6ea6ea108f51d32ca7140c1cdfb68327b6cdae3
     for org in orgs:
         if org_name in org["name"]:
             org_id = org["id"]
 
     if org_id == "":
-<<<<<<< HEAD
-        print("Organization not found.")
-
-    ### Pull the networks associated with the organization. ###
-    networks = merakiapi.getnetworklist(api_key, org_id, True)
-=======
         print("Orginization not Found")
     ### Pull the networks associated with the organization. ###
     networks = []
     for org in orgs:
         networks += merakiapi.getnetworklist(api_key, org["id"], True)
->>>>>>> e6ea6ea108f51d32ca7140c1cdfb68327b6cdae3
 
     ### Pull the devices from all of the networks. ###
     devices = []
     for network in networks:
         devices += merakiapi.getnetworkdevices(api_key, network["id"], True)
-<<<<<<< HEAD
-    # print devices
-=======
->>>>>>> e6ea6ea108f51d32ca7140c1cdfb68327b6cdae3
 
     switch_ports = []
     for device in devices:
@@ -384,34 +331,6 @@ def configure():
     print(switch_ports)
 
     ### Apply configuration to the devices and push them to Meraki. ###
-<<<<<<< HEAD
-    for switch_port in switch_ports:
-        try:
-            switch_port["name"] = configurations[switch_port["serial"], str(switch_port["number"])].name
-        except:
-            continue
-        switch_port["tags"] = configurations[switch_port["serial"], str(switch_port["number"])].tags
-        switch_port["enabled"] = configurations[switch_port["serial"], str(switch_port["number"])].enabled
-        switch_port["rstpEnabled"] = configurations[switch_port["serial"], str(switch_port["number"])].rstp
-        switch_port["stpGuard"] = configurations[switch_port["serial"], str(switch_port["number"])].stp_guard
-        switch_port["poeEnabled"] = configurations[switch_port["serial"], str(switch_port["number"])].poe
-        switch_port["type"] = configurations[switch_port["serial"], str(switch_port["number"])].type
-        switch_port["vlan"] = configurations[switch_port["serial"], str(switch_port["number"])].vlan
-        switch_port["voiceVlan"] = configurations[switch_port["serial"], str(switch_port["number"])].voice_vlan
-        switch_port["allowedVlans"] = configurations[switch_port["serial"], str(switch_port["number"])].allowed_vlan
-
-        # print (switch_port["enabled"])
-
-
-        merakiapi.updateswitchport(api_key, switch_port["serial"], switch_port["number"], switch_port["name"],
-                                   switch_port["tags"], switch_port["enabled"], switch_port["type"],
-                                   switch_port["vlan"], switch_port["voiceVlan"], switch_port["allowedVlans"],
-                                   switch_port["poeEnabled"], "", switch_port["rstpEnabled"], switch_port["stpGuard"],
-                                   "")
-        progress_count += 1
-        progress_percent = '{:.1%}'.format(progress_count / progress_total)
-        print(progress_percent)
-=======
 
     ### Yield progress bar status to site ###
     def generate():
@@ -449,16 +368,12 @@ def configure():
     return Response(generate(), mimetype ='text/event-stream')
 
 
->>>>>>> e6ea6ea108f51d32ca7140c1cdfb68327b6cdae3
 
     archive_path = os.path.abspath(os.path.join('app', 'archive'))
     shutil.copy(temp_path, archive_path)
     file_rename()
     archive_limit()
 
-<<<<<<< HEAD
-    return "IT WORKS!"
-=======
     #return "IT WORKS!"
 
 
@@ -485,7 +400,6 @@ def stream_view():
     rows = generate()
     return Response(stream_template('step3.html', rows=rows))
 
->>>>>>> e6ea6ea108f51d32ca7140c1cdfb68327b6cdae3
 
 
 if __name__ == "__main__":

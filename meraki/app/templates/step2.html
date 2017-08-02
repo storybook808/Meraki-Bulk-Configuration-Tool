@@ -41,7 +41,6 @@ line-height: 90px; padding-top: 100px">
 
             <!-- Display error messages for what is wrong -->
             {% with messages = get_flashed_messages() %}
-<<<<<<< HEAD
                 {% if messages %}
                 <ul class = flashes>
                     <div class="ui warning message">
@@ -52,18 +51,6 @@ line-height: 90px; padding-top: 100px">
                     </div>
                 </ul>
                 {% endif %}
-=======
-            {% if messages %}
-            <ul class=flashes>
-                <div class="ui warning message">
-                    <div class="header"></div>
-                    {% for message in messages %}
-                    <center>{{message}}</center>
-                    {% endfor %}
-                </div>
-            </ul>
-            {% endif %}
->>>>>>> e6ea6ea108f51d32ca7140c1cdfb68327b6cdae3
             {% endwith %}
 
 
@@ -73,10 +60,6 @@ line-height: 90px; padding-top: 100px">
             <h4> Choose an excel workbook to configure the switch </h4>
 
 
-<<<<<<< HEAD
-
-=======
->>>>>>> e6ea6ea108f51d32ca7140c1cdfb68327b6cdae3
                 <form action="http://localhost:5000/uploader" method="POST"
                       enctype="multipart/form-data">
                     <input type="file" name="file"/>
