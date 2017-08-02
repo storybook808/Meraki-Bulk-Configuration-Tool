@@ -4,7 +4,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.css">
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
     <script type="text/javascript"
-            src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.js"></script>
+            src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.js">
+    </script>
 
     <script>
     var source = new EventSource("/progress");
@@ -12,8 +13,17 @@
         $('#progress-bar').progress({
             percent: event.data
         }).attr('aria-valuenow', event.data);
-    }
 
+        console.log(event.data);
+        var progress_text = document.getElementById("progress-text");
+        var retrieving_loader = document.getElementById("retrieving-loader");
+        if (event.data > 0 && event.data < 100) {
+            progress_text.innerHTML = "Configuring Switches...";
+            retrieving_loader.innerHTML = null;
+        }else if (event.data = 100) {
+            progress_text.innerHTML = "Configuration Complete";
+        }
+    }
     </script>
     <!--header image-->
     <div class="ui small images">
@@ -50,11 +60,37 @@
             <div class="bar">
                 <div class="progress"></div>
             </div>
-            <div class="label">Processing...</div>
-
+            <div class="label" id="progress-text">Retrieving Configuration</div>
         </div>
+        <style>
+            .loader {
+              position: absolute;
+              left: 615px;
+              top: 300px;
+              border: 6px solid #f3f3f3;
+              border-radius: 50%;
+              border-top: 6px solid cornflowerBlue ;
+              border-bottom: 6px solid cornflowerBlue ;
+              width: 50px;
+              height: 50px;
+              -webkit-animation: spin 2s linear infinite;
+              animation: spin 2s linear infinite;
+            }
 
+            @-webkit-keyframes spin {
+              0% { -webkit-transform: rotate(0deg); }
+              100% { -webkit-transform: rotate(360deg); }
+            }
 
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+        </style>
+        <div id="retrieving-loader">
+            <div class="loader">
+            </div>
+        </div>
     </div>
 </body>
 </html>
