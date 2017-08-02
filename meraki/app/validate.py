@@ -19,7 +19,7 @@ def validate_form():
     print(path + current_file[0])
     # open up working excel file to validate.
     workbook = xlrd.open_workbook(path + '/' + current_file[0])
-    worksheet = workbook.sheet_by_index(1)
+    worksheet = workbook.sheet_by_index(2)
 
     flag = 0
 
@@ -62,6 +62,7 @@ def validate_form():
         if type.value.lower() == "trunk" or type.value.lower() == "access" or type.value.lower() == '':
             pass
         else:
+
             flash("ERROR! Type must be either access or trunk. Check cell: J", row)
             flag += 1
 
@@ -89,14 +90,12 @@ def validate_form():
         if port_number.ctype == 0 or port_number.ctype == 2:
             pass
         else:
-
             flash("ERROR! Port # must be a number. Check cell: C", row)
             flag += 1
 
         # for checking that Allowed VLANs can be all or comma seperated numbers
         # grab value for allowed VLANS
         allowed_vlan = worksheet.cell(row, 12)
-
         if allowed_vlan.ctype == 0 or allowed_vlan.ctype == 1 or allowed_vlan.value == 'all' or allowed_vlan.ctype == 2 or allowed_vlan.value == '':
             pass
         else:
