@@ -1,9 +1,10 @@
 from flask import Blueprint
 import merakiapi ,time
 import os, shutil
-from flask import Flask, stream_with_context, request, Response, flash, send_file
+from flask import Flask, stream_with_context, request, Response, flash, send_file, render_template
 from time import sleep
 from app import app
+import sys
 import xlrd
 
 configure_blueprint = Blueprint('configure', __name__, template_folder='templates')
@@ -363,13 +364,18 @@ def configure():
             progress_count += 1
             print(progress_count)
             progress_percent = progress_count / progress_total * 100
-            # print(progress_percent)
+            print(progress_percent)
+            print(type(progress_percent))
+
             yield "data:" + str(progress_percent) + "\n\n"
+            if progress_percent >= 100:
+                sys.exit()
+
     return Response(generate(), mimetype ='text/event-stream')
 
 
 
-    archive_path = os.path.abspath(os.path.join('app', 'archive'))
+   # archive_path = os.path.abspath(os.path.join('app', 'archive'))
     shutil.copy(temp_path, archive_path)
     file_rename()
     archive_limit()
