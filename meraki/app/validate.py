@@ -16,8 +16,13 @@ def validate_form():
     # open up working excel file to validate.
     # dictate path for excel file
     path = os.path.abspath(os.path.join('app', 'temp'))
-    current_file = os.listdir(path)
-    print(path + current_file[0])
+    try:
+        current_file = os.listdir(path)
+        print(path + current_file[0])
+    except IndexError:
+        flash('ERROR! No file uploaded. Please upload a file')
+        return render_template('step2.html')
+
     # open up working excel file to validate.
     try:
         workbook = xlrd.open_workbook(path + '/' + current_file[0])

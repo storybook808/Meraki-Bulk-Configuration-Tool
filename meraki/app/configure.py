@@ -293,9 +293,12 @@ def configure():
 
     ### Pull the organizations associated to the provided API key.
     orgs = merakiapi.myorgaccess(api_key, True)
-    print(orgs)
 
-    org_name = "World Wide"
+    #if orgs is None :
+    #    flash('ERROR! Cannot find organization. Check API key')
+    #    return render_template('step2.html')
+
+    org_name = 'World Wide'
 
     for org in orgs:
         if org_name in org["name"]:
