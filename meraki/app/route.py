@@ -1,6 +1,7 @@
 from app import app
 
-from flask import render_template, session, redirect, url_for, flash, request
+from flask import Response, render_template, session, redirect, url_for, flash, request
+
 import os
 from werkzeug import secure_filename
 import os, shutil
@@ -11,11 +12,6 @@ import time
 from app import app
 
 # route to file uploader
-
-''''@app.route('/progress')
-def progress():
-    global progress_percent
-    return progress_percent'''
 
 
 @app.route('/uploader', methods=['GET', 'POST'])
@@ -61,8 +57,6 @@ def upload_file():
         return redirect(url_for('step2'))
 
 
-
-
 @app.route('/')
 
 
@@ -71,18 +65,6 @@ def upload_file():
 @app.route('/step1.html')
 def step1():
     return render_template('step1.html')
-
-''''@app.route('/progress')
-def progress():
-    def generate():
-        configure()
-        x = 0
-        while x < 100:
-            print(x)
-            x = x + 10
-            time.sleep(0.2)
-            yield "data:" + str(x) + "\n\n"
-    return Response(generate(), mimetype= 'text/event-stream')'''
 
 # Route to step2 page
 # Formats the step2.html page

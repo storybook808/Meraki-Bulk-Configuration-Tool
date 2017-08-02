@@ -6,6 +6,17 @@
     <script type="text/javascript"
             src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.js"></script>
 
+
+    <script>
+    var source = new EventSource("/progress");
+    source.onmessage = function(event) {
+        $('#progress-bar').progress({
+            percent: event.data
+        }).attr('aria-valuenow', event.data);
+    }
+
+    </script>
+
     <!--header image-->
     <div class="ui small images">
         <img class="ui image" style="width: 25%; display: block; margin-left: auto; margin-right: auto"
@@ -36,45 +47,16 @@
                 </div>
             </div>
         </div>
-        <div class="ui centered container"
-             style="text-align: center; vertical-align: middle; line-height: 90px; padding-top: 100px">
-            <h2>
-                Processing Data... Please Wait
-            </h2>
 
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.css">
-            <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-            <script type="text/javascript"
-                src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.js"></script>
-            <script>
-
-            var source = new EventSource("/progress");
-            source.onmessage = function(event) {
-                $('#progress-bar').progress({
-                percent: event.data
-            }).attr('aria-valuenow', event.data);
-            }
-            </script>
-
-            <div class="ui indicating progress" id="progress-bar" style="width:50%;margin:auto">
+        <div class="ui indicating progress" id="progress-bar" style="width:50%;margin:auto">
             <div class="bar">
-            <div class="progress"></div>
+                <div class="progress"></div>
             </div>
             <div class="label">Processing...</div>
-            gi</div>
 
         </div>
-        {% for item in rows %}
-        <h1>
-            <center>{{ item }}</center>
-        </h1>
-        <h2>
-            <center>All switches have been configured</center>
-        </h2>
-        {% endfor %}
 
 
     </div>
-</div>
 </body>
 </html>
