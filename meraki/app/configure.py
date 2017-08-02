@@ -192,7 +192,6 @@ def configure():
     api_key = get_api_key(temp_path)
 
     ## Code to configure the base configuration for switches
-
     # Pull the configurations.
     workbook = xlrd.open_workbook(temp_path)
     ws = workbook.sheet_by_index(1)
@@ -223,8 +222,6 @@ def configure():
             device["name"] = hostname
             print(device["name"])
             merakiapi.updatedevice(api_key, device["networkId"], device["serial"], device["name"], "", "", "", "", True)
-
-    exit()
 
     ### Pull the configurations. ###
     configurations = {}
