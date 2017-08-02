@@ -1,5 +1,5 @@
 from flask import Blueprint
-import merakiapi,time 
+import merakiapi ,time
 import os, shutil
 from flask import Flask, stream_with_context, request, Response, flash, send_file
 from time import sleep
