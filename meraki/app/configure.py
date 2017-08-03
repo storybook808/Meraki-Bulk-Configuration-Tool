@@ -1,30 +1,31 @@
 from flask import Blueprint
+
 import merakiapi ,time
 import os, shutil
+
 from flask import Flask, stream_with_context, request, Response, flash, send_file, render_template
+
 from time import sleep
 from app import app
 import sys
 import xlrd
 
+
 configure_blueprint = Blueprint('configure', __name__, template_folder='templates')
 
+# Route to step 3 with progress bar
 @app.route('/step3')
 def progress_bar():
     global progress_bar
     return send_file('templates/step3.html')
 
 
-# This function configures the meraki page
 @configure_blueprint.route('/progress')
 def configure():
-
     global progress_percent
     global org_name
 
-
 # This function configures the meraki page
-
     class Device:
         def __init__(self, row):
             self.hostname = row[0]
@@ -177,49 +178,6 @@ def configure():
                 if counter == 19:
                     break
 
-    ### Code to configure the base configuration for switches
-    # def main():
-    #     # Pull the configurations.
-    #     configurations = {}
-    #     file_1 = open("Device Base Configuration.csv")
-    #     csv_1 = csv.reader(file_1)
-    #     for row in csv_1:
-    #         configurations[row[0]] = Device(row)
-    #
-    #     # API key.
-    #     api_key = ""
-    #
-    #     # Get the organization name.
-    #     print("Organization Name:")
-    #     org_name = raw_input()
-    #
-    #     # Pull the organizations associated to the provided API key.
-    #     orgs = merakiapi.myorgaccess(api_key, True)
-    #
-    #     # Look for the organization that we want to configure.
-    #     org_id = ""
-    #     for org in orgs:
-    #         if org_name in org["name"]:
-    #             org_id = org["id"]
-    #
-    #     if org_id == "":
-    #         print("Organization not found.")
-    #         return
-    #
-    #     # Pull the networks associated with the organization.
-    #     networks = merakiapi.getnetworklist(api_key, org_id, True)
-    #
-    #     # Pull the devices from all of the networks.
-    #     devices = []
-    #     for network in networks:
-    #         devices += merakiapi.getnetworkdevices(api_key, network["id"], True)
-    #
-    #     # Apply configuration to the devices and push them to Meraki.
-    #     for device in devices:
-    #         device["name"] = configurations[device["serial"]].hostname
-    #         merakiapi.updatedevice(api_key, device["networkId"], device["serial"], device["name"], "", "", "", "", True)
-    #
-    #     return
 
     ### Find file path to pull configurations ###
     path = os.path.abspath(os.path.join('app', 'temp'))
@@ -231,6 +189,41 @@ def configure():
     print(current_file[0])
     print(os.path.join(path, current_file[0]))
     temp_path = os.path.join(path, current_file[0])  # path of configuration file
+
+    # API key.
+    api_key = get_api_key(temp_path)
+
+    ## Code to configure the base configuration for switches
+    # Pull the configurations.
+    workbook = xlrd.open_workbook(temp_path)
+    ws = workbook.sheet_by_index(1)
+    print (ws)
+    for row in range(1, ws.nrows):
+        hostname = ws.cell_value(row, 1)
+        serial = ws.cell_value(row, 0)
+        print("hostname:",hostname)
+        print("serial:", serial)
+
+    # Pull the organizations associated to the provided API key.
+    orgs = merakiapi.myorgaccess(api_key, True)
+
+    # Pull the networks associated with the organization.
+    networks = []
+    for org in orgs:
+        networks += merakiapi.getnetworklist(api_key, org["id"], True)
+
+    # Pull the devices from all of the networks.
+    devices = []
+    for network in networks:
+        devices += merakiapi.getnetworkdevices(api_key, network["id"], True)
+
+    # Apply configuration to the devices and push them to Meraki.
+    for device in devices:
+        if serial == device["serial"]:
+            print (serial)
+            device["name"] = hostname
+            print(device["name"])
+            merakiapi.updatedevice(api_key, device["networkId"], device["serial"], device["name"], "", "", "", "", True)
 
     ### Pull the configurations. ###
     configurations = {}
@@ -284,15 +277,9 @@ def configure():
 
     # print(configurations)
 
-    # API key.
-
-
-    api_key = get_api_key(temp_path)
-
-
-
     ### Pull the organizations associated to the provided API key.
     orgs = merakiapi.myorgaccess(api_key, True)
+
 
     #if orgs is None :
     #    flash('ERROR! Cannot find organization. Check API key')
@@ -306,6 +293,7 @@ def configure():
 
     if org_id == "":
         print("Orginization not Found")
+
     ### Pull the networks associated with the organization. ###
     networks = []
     for org in orgs:
@@ -338,7 +326,6 @@ def configure():
     archive_limit()
 
     ### Apply configuration to the devices and push them to Meraki. ###
-
     ### Yield progress bar status to site ###
     def generate():
         progress_count = 0
@@ -360,11 +347,11 @@ def configure():
             # print (switch_port["enabled"])
 
 
-            merakiapi.updateswitchport(api_key, switch_port["serial"], switch_port["number"], switch_port["name"],
+            '''merakiapi.updateswitchport(api_key, switch_port["serial"], switch_port["number"], switch_port["name"],
                                        switch_port["tags"], switch_port["enabled"], switch_port["type"],
                                        switch_port["vlan"], switch_port["voiceVlan"], switch_port["allowedVlans"],
                                        switch_port["poeEnabled"], "", switch_port["rstpEnabled"], switch_port["stpGuard"],
-                                       "")
+                                       "")'''
 
             # progress_percent = '{:.1%}'.format(progress_count / progress_total)
             progress_count += 1
@@ -380,7 +367,11 @@ def configure():
     return Response(generate(), mimetype ='text/event-stream')
 
 
+   # archive_path = os.path.abspath(os.path.join('app', 'archive'))
 
+    shutil.copy(temp_path, archive_path)
+    file_rename()
+    archive_limit()
 
 
     #return "IT WORKS!"
@@ -393,21 +384,17 @@ def stream_template(template_name, **context):
     rv.disable_buffering()
     return rv
 
-
-
 def generate():
     # configure()
     for progress in range(1):
         yield (progress_percent)
         sleep(1)
 
-
-
-
 @configure_blueprint.route('/stream')
 def stream_view():
     rows = generate()
     return Response(stream_template('step3.html', rows=rows))
+
 
 
 

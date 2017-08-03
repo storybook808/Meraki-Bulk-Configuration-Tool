@@ -1,17 +1,11 @@
 from app import app
-from flask import Response, render_template, session, redirect, url_for, flash, request
-import os
+from flask import render_template, redirect, url_for, flash, request
 from werkzeug import secure_filename
-import os, shutil
+
 app.secret_key = 'some_secret'
 
-from flask import Response
-import time
-from app import app
 
-# route to file uploader
-
-
+# Route to file uploader
 @app.route('/uploader', methods=['GET', 'POST'])
 def upload_file():
     import os
@@ -55,9 +49,10 @@ def upload_file():
         return redirect(url_for('step2'))
 
 
-
 @app.route('/')
 
+# Route to step1 page
+# Formats the step1.html page
 @app.route('/step1.html')
 def step1():
     return render_template('step1.html')
@@ -73,7 +68,6 @@ def step2():
 @app.route('/step2a.html')
 def step2a():
     return render_template('step2a.html')
-
 
 # Route to step3 page
 # Formats the step1.html page
