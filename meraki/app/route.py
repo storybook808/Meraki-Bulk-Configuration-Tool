@@ -37,7 +37,6 @@ def upload_file():
         print(current_file)
 
         # if there is more than a single file in the temp folder remove the extra files
-
         if len(current_file) > 1:
             # remove all files except the first
             os.remove(os.path.join(path, current_file[1]))

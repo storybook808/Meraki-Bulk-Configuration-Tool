@@ -1,14 +1,14 @@
 from flask import Blueprint
-
-import merakiapi ,time
-import os, shutil
-
-from flask import Flask, stream_with_context, request, Response, flash, send_file, render_template
-
-from time import sleep
+from flask import Response, send_file
 from app import app
+from time import sleep
+
+import merakiapi
+import os
+import shutil
 import sys
 import xlrd
+
 
 
 configure_blueprint = Blueprint('configure', __name__, template_folder='templates')
@@ -72,19 +72,15 @@ def configure():
         workbook = xlrd.open_workbook(api_path)
         ws = workbook.sheet_by_index(0)
         cell = ws.cell_value(1, 0)
-        print(cell)
-        print(type(cell))
+        #print(cell)
+        #print(type(cell))
         return cell
-
-
-
 
     # Time Function
     # Purpose: Calculate the time to append to file name to better
     # debug Meraki configurations
     # Param: None
     # Output: Date_Time
-
     def time():
         import time
 
@@ -93,38 +89,26 @@ def configure():
 
         return date + "_" + time
 
-    # sessionID Function
-    # Purpose: return a unique ID tag to see what configuration of the Meraki
-    # switch is related to
-    # Param: None
-    # Output: 10 character string of uppercase chars
-    # def sessionID():
-    #   import string
-    #    import random
-
-    #    chars = string.ascii_uppercase
-    #    size = 4
-
-    #    return ''.join(random.choice(chars) for _ in range(size))
 
     # file_rename Function
     # Purpose: renames files using the above time and sessionID functions
     # Param: None
     # Output: renamed file put into archive
-
     def file_rename():
 
         # assign a path based to the temp folder
         path = os.path.abspath(os.path.join('app', 'temp'))
+
         # get a list of all files in temp
         # this should only be a single file
         current_file = os.listdir(path)
-        # id = sessionID()
         # print("file_RE_NAME")
         # print(current_file)
         print(os.path.abspath(os.path.join('temp', current_file[0])))
+
         # get the absolute path to the singleton file
         rename_src_path = os.path.abspath(os.path.join("app", "temp", current_file[0]))
+
         # get the absolute path to the destination folder, archive
         # name the new file based on the time and a unique ID
         rename_dst_path = os.path.abspath(
@@ -135,11 +119,6 @@ def configure():
             os.path.join('app', 'temp', current_file[0]))
         shutil.copy(rename_src_path, rename_dst_path)
         os.replace(rename_src_path, copy_dst_path)
-
-
-       # if len(archive_folder) > 2:
-        #    while len(archive_folder) > 2:
-        #        os.remove(os.path.join(archive_path, archive_folder[0]))
 
     # archive_limit() Function
     # Purpose: limits the amount of files allowed in the archive folder
@@ -163,6 +142,7 @@ def configure():
         # populate the list
         for i in range(len(archive_folder)):
             arch_folder_path_list.append(os.path.join(archive_path, archive_folder[i]))
+
         # using a bubble sort, sort the list based on the date last modified
         for j in range(len(arch_folder_path_list)):
             for k in range(len(arch_folder_path_list)-1, j, -1):
@@ -179,7 +159,7 @@ def configure():
                     break
 
 
-    ### Find file path to pull configurations ###
+    # Find file path to pull configurations
     path = os.path.abspath(os.path.join('app', 'temp'))
     # path = os.path.join(initial_path, 'temp')
     current_file = os.listdir(path)
@@ -193,8 +173,8 @@ def configure():
     # API key.
     api_key = get_api_key(temp_path)
 
-    ## Code to configure the base configuration for switches
-    # Pull the configurations.
+    # Code to configure the base configuration for switches
+    # Pull the configurations
     workbook = xlrd.open_workbook(temp_path)
     ws = workbook.sheet_by_index(1)
     print (ws)
@@ -225,15 +205,15 @@ def configure():
             print(device["name"])
             merakiapi.updatedevice(api_key, device["networkId"], device["serial"], device["name"], "", "", "", "", True)
 
-    ### Pull the configurations. ###
+    # Pull the configurations
     configurations = {}
     from openpyxl import load_workbook
     wb = load_workbook(filename=temp_path)
-    port_config_sheet = wb.get_sheet_names()[1]
+    port_config_sheet = wb.get_sheet_names()[2]
     print(port_config_sheet)
     ws = wb[port_config_sheet]
 
-    ### valid row count ###
+    # Valid row count
     valid_row = 0  # will be incremented to the number of valid rows
     threshold = 2  # how many consecutive blank rows are allow before program stops scanning excel content
     real_row = 0  # track the actual row in excel file, including blank rows
@@ -254,7 +234,7 @@ def configure():
     progress_total = valid_row - 1  # save total number of excel entries to track for progress while compiling
 
 
-    # create dictionary for switch port
+    # Create dictionary for switch port
     my_row = []
     i = 0
     while valid_row != 0:
@@ -277,29 +257,16 @@ def configure():
 
     # print(configurations)
 
-    ### Pull the organizations associated to the provided API key.
+    # Pull the organizations associated to the provided API key
     orgs = merakiapi.myorgaccess(api_key, True)
 
 
-    #if orgs is None :
-    #    flash('ERROR! Cannot find organization. Check API key')
-    #    return render_template('step2.html')
-
-    org_name = 'World Wide'
-
-    for org in orgs:
-        if org_name in org["name"]:
-            org_id = org["id"]
-
-    if org_id == "":
-        print("Orginization not Found")
-
-    ### Pull the networks associated with the organization. ###
+    # Pull the networks associated with the organization
     networks = []
     for org in orgs:
         networks += merakiapi.getnetworklist(api_key, org["id"], True)
 
-    ### Pull the devices from all of the networks. ###
+    # Pull the devices from all of the networks
     devices = []
     for network in networks:
         devices += merakiapi.getnetworkdevices(api_key, network["id"], True)
@@ -308,8 +275,6 @@ def configure():
     for device in devices:
         current_switch_ports = []
         if device["model"].startswith("MS"):
-            # current_switch_port = merakiapi.getswitchports(api_key, device["serial"])
-            # current_switch_port["serial"] = device["serial"]
             current_switch_ports = merakiapi.getswitchports(api_key, device["serial"], True)
 
         # Label all current switch ports with the serial number of the parent switch.
@@ -325,8 +290,8 @@ def configure():
     file_rename()
     archive_limit()
 
-    ### Apply configuration to the devices and push them to Meraki. ###
-    ### Yield progress bar status to site ###
+    # Apply configuration to the devices and push them to Meraki
+    # Yield progress bar status to site
     def generate():
         progress_count = 0
         for switch_port in switch_ports:
@@ -346,35 +311,24 @@ def configure():
 
             # print (switch_port["enabled"])
 
-
-            '''merakiapi.updateswitchport(api_key, switch_port["serial"], switch_port["number"], switch_port["name"],
+            merakiapi.updateswitchport(api_key, switch_port["serial"], switch_port["number"], switch_port["name"],
                                        switch_port["tags"], switch_port["enabled"], switch_port["type"],
                                        switch_port["vlan"], switch_port["voiceVlan"], switch_port["allowedVlans"],
                                        switch_port["poeEnabled"], "", switch_port["rstpEnabled"], switch_port["stpGuard"],
-                                       "")'''
+                                       "")
 
-            # progress_percent = '{:.1%}'.format(progress_count / progress_total)
             progress_count += 1
-            print(progress_count)
+            # print(progress_count)
             progress_percent = progress_count / progress_total * 100
-            print(progress_percent)
-            print(type(progress_percent))
+            # print(progress_percent)
+            # print(type(progress_percent))
 
+            # Grabbing data for progress bar
             yield "data:" + str(progress_percent) + "\n\n"
             if progress_percent >= 100:
                 sys.exit()
 
     return Response(generate(), mimetype ='text/event-stream')
-
-
-   # archive_path = os.path.abspath(os.path.join('app', 'archive'))
-
-    shutil.copy(temp_path, archive_path)
-    file_rename()
-    archive_limit()
-
-
-    #return "IT WORKS!"
 
 
 def stream_template(template_name, **context):
@@ -385,7 +339,6 @@ def stream_template(template_name, **context):
     return rv
 
 def generate():
-    # configure()
     for progress in range(1):
         yield (progress_percent)
         sleep(1)
@@ -394,9 +347,6 @@ def generate():
 def stream_view():
     rows = generate()
     return Response(stream_template('step3.html', rows=rows))
-
-
-
 
 if __name__ == "__main__":
     main()

@@ -1,14 +1,11 @@
-from app import app
 from flask import redirect, url_for, flash, Blueprint, render_template
-from time import sleep
+
 import os
 
 
 validate_blueprint = Blueprint('validate', __name__, template_folder='templates')
 
 # Route to validation script
-
-
 @validate_blueprint.route('/validate/')
 def validate_form():
     import xlrd
@@ -24,7 +21,6 @@ def validate_form():
         return render_template('step2.html')
 
     # open up working excel file to validate.
-
     try:
         workbook = xlrd.open_workbook(path + '/' + current_file[0])
     except xlrd.biffh.XLRDError:
@@ -32,7 +28,7 @@ def validate_form():
         return render_template('step2.html')
 
     api_worksheet = workbook.sheet_by_index(0)
-    worksheet = workbook.sheet_by_index()
+    worksheet = workbook.sheet_by_index(2)
 
     flag = 0
 
@@ -44,7 +40,7 @@ def validate_form():
         flag += 1
 
 
-    # for T/F values: Enabled, RSTP and PoE
+    # for checking T/F values: Enabled, RSTP and PoE
     for row in range(1, worksheet.nrows):
         # grab value for enable
         enable = worksheet.cell_value(row, 5)
